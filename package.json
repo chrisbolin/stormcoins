@@ -1,0 +1,8 @@
+{
+  "name": "stormcoins",
+  "version": "1.0.0",
+  "main": "false",
+  "author": "Chris Bolin <bolin.chris@gmail.com>",
+  "license": "MIT",
+  "private": true
+}
