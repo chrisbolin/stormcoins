@@ -3,7 +3,16 @@ import { useEffect, useCallback, useReducer, Dispatch } from "react";
 export interface GameState {
   engine: boolean;
   timestamp: number;
+  vehicleX: number;
+  vehicleY: number;
 }
+
+export const initialGameState: GameState = {
+  engine: false,
+  timestamp: 0,
+  vehicleX: 50,
+  vehicleY: 20
+};
 
 const TICK = "tick";
 const START_ENGINE = "start_engine";
@@ -20,15 +29,11 @@ interface TickAction {
 
 export type GameAction = TickAction | BasicAction;
 
-export const initialGameState: GameState = {
-  engine: false,
-  timestamp: 0
-};
-
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
-      return { ...state, timestamp: action.timestamp };
+      const vehicleY = state.vehicleY + (state.engine ? 1 : -1);
+      return { ...state, timestamp: action.timestamp, vehicleY };
     case START_ENGINE:
       return { ...state, engine: true };
     case STOP_ENGINE:
@@ -41,7 +46,7 @@ export function gameReducer(state: GameState, action: GameAction) {
 export function useGameLoop(): [GameState, Dispatch<GameAction>] {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   const tick = useCallback(newTimestamp => {
-    dispatch({ type: "tick", timestamp: newTimestamp });
+    dispatch({ type: TICK, timestamp: newTimestamp });
     window.requestAnimationFrame(tick);
   }, []);
 

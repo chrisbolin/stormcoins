@@ -10,10 +10,13 @@ function Platform() {
   return <div className="platform">platform</div>;
 }
 
-function Helicopter() {
-  const { engine } = useContext(StateContext);
+function Vehicle() {
+  const { engine, vehicleX, vehicleY } = useContext(StateContext);
   return (
-    <div className="helicopter">
+    <div
+      className="vehicle"
+      style={{ left: `${vehicleX}vw`, bottom: `${vehicleY}vw` }}
+    >
       helicopter
       <br />
       {engine ? "ON" : ""}
@@ -32,7 +35,7 @@ const Game = memo(function() {
       onTouchStart={() => dispatch({ type: "start_engine" })}
       onTouchEnd={() => dispatch({ type: "stop_engine" })}
     >
-      <Helicopter />
+      <Vehicle />
       <Platform />
       <TestComponent value="Game child" />
     </div>
