@@ -12,6 +12,7 @@ export interface GameState {
   positionY: number;
   velocityX: number;
   velocityY: number;
+  windVelocityX: number;
 }
 
 export const initialGameState: GameState = {
@@ -20,7 +21,8 @@ export const initialGameState: GameState = {
   positionX: 50,
   positionY: 20,
   velocityX: 0,
-  velocityY: 0
+  velocityY: 0,
+  windVelocityX: 1
 };
 
 // ACTIONS
@@ -52,14 +54,16 @@ export function gameReducer(state: GameState, action: GameAction) {
       const velocityY =
         state.velocityY +
         (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
+      const velocityX = state.windVelocityX;
       // position
-      const positionX = state.positionX + state.velocityX;
+      const positionX = (state.positionX + state.velocityX) % 100;
       const positionY = state.positionY + state.velocityY;
       return {
         ...state,
         timestamp: action.timestamp,
         positionX,
         positionY,
+        velocityX,
         velocityY
       };
     case START_ENGINE:
