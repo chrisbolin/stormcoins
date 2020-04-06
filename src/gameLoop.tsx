@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useReducer, Dispatch } from "react";
 
 // PHYSICAL CONSTANTS
-const FORCE_GRAVITY = 4 / 100000; // note: dt is in milliseconds, so this constant needs to be very small
-const FORCE_ENGINE = 2 * FORCE_GRAVITY;
+const FORCE_GRAVITY = 4.5 / 100000; // note: dt is in milliseconds, so this constant needs to be very small
+const FORCE_ENGINE = 2.5 * FORCE_GRAVITY;
 
 // STATE
 export interface GameState {
@@ -19,7 +19,7 @@ export const initialGameState: GameState = {
   engine: false,
   timestamp: 0,
   positionX: 50,
-  positionY: 20,
+  positionY: 30,
   velocityX: 0,
   velocityY: 0,
   windVelocityX: 0.02
