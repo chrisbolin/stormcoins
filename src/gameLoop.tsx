@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useReducer, Dispatch } from "react";
 
 // PHYSICAL CONSTANTS
-const FORCE_GRAVITY = 0.001; // note: dt is in milliseconds
+const FORCE_GRAVITY = 4 / 100000; // note: dt is in milliseconds, so this constant needs to be very small
 const FORCE_ENGINE = 2 * FORCE_GRAVITY;
 
 // STATE
@@ -22,7 +22,7 @@ export const initialGameState: GameState = {
   positionY: 20,
   velocityX: 0,
   velocityY: 0,
-  windVelocityX: 1
+  windVelocityX: 0.02
 };
 
 // ACTIONS
@@ -56,8 +56,8 @@ export function gameReducer(state: GameState, action: GameAction) {
         (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
       const velocityX = state.windVelocityX;
       // position
-      const positionX = (state.positionX + state.velocityX) % 100;
-      const positionY = state.positionY + state.velocityY;
+      const positionX = (state.positionX + dt * state.velocityX) % 100;
+      const positionY = state.positionY + dt * state.velocityY;
       return {
         ...state,
         timestamp: action.timestamp,

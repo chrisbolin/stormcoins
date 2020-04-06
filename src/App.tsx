@@ -13,22 +13,16 @@ const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
 
 function Platform() {
-  console.log("<Platform/>");
-  return <div className="platform">platform</div>;
+  return <div className="platform"></div>;
 }
 
 function Vehicle() {
-  const { engine, positionX, positionY } = useContext(StateContext);
+  const { positionX, positionY } = useContext(StateContext);
   return (
     <div
       className="vehicle"
       style={{ left: `${positionX}vw`, bottom: `${positionY}vw` }}
-    >
-      helicopter
-      <br />
-      {engine ? "ON" : ""}
-      <br />
-    </div>
+    ></div>
   );
 }
 
