@@ -2,7 +2,7 @@ import { useEffect, useCallback, useReducer, Dispatch } from "react";
 
 // PHYSICAL CONSTANTS
 const FORCE_GRAVITY = 0.001; // note: dt is in milliseconds
-const FORCE_ENGINE = FORCE_GRAVITY * 2;
+const FORCE_ENGINE = 2 * FORCE_GRAVITY;
 
 // STATE
 export interface GameState {
@@ -27,9 +27,10 @@ export const initialGameState: GameState = {
 const TICK = "tick";
 const START_ENGINE = "start_engine";
 const STOP_ENGINE = "stop_engine";
+const RESTART = "restart";
 
 interface BasicAction {
-  type: typeof START_ENGINE | typeof STOP_ENGINE;
+  type: typeof START_ENGINE | typeof STOP_ENGINE | typeof RESTART;
 }
 
 interface TickAction {
@@ -39,20 +40,21 @@ interface TickAction {
 
 export type GameAction = TickAction | BasicAction;
 
+export const startEngine: GameAction = { type: START_ENGINE };
+export const stopEngine: GameAction = { type: STOP_ENGINE };
+export const restart: GameAction = { type: RESTART };
+
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
       const dt = action.timestamp - state.timestamp;
-
       // velocity
       const velocityY =
         state.velocityY +
         (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
-
       // position
       const positionX = state.positionX + state.velocityX;
       const positionY = state.positionY + state.velocityY;
-
       return {
         ...state,
         timestamp: action.timestamp,
@@ -64,8 +66,10 @@ export function gameReducer(state: GameState, action: GameAction) {
       return { ...state, engine: true };
     case STOP_ENGINE:
       return { ...state, engine: false };
+    case RESTART:
+      return { ...initialGameState, timestamp: state.timestamp };
     default:
-      throw new Error(`Invalid action: ${action}`);
+      throw new Error(`Invalid action: ${JSON.stringify(action)}`);
   }
 }
 

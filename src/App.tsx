@@ -1,6 +1,13 @@
 import React, { createContext, memo, useContext } from "react";
 import "./App.css";
-import { initialGameState, GameAction, useGameLoop } from "./gameLoop";
+import {
+  initialGameState,
+  GameAction,
+  useGameLoop,
+  startEngine,
+  stopEngine,
+  restart
+} from "./gameLoop";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
@@ -30,22 +37,17 @@ const Game = memo(function() {
   return (
     <div
       className="game"
-      onMouseDown={() => dispatch({ type: "start_engine" })}
-      onMouseUp={() => dispatch({ type: "stop_engine" })}
-      onTouchStart={() => dispatch({ type: "start_engine" })}
-      onTouchEnd={() => dispatch({ type: "stop_engine" })}
+      onMouseDown={() => dispatch(startEngine)}
+      onMouseUp={() => dispatch(stopEngine)}
+      onTouchStart={() => dispatch(startEngine)}
+      onTouchEnd={() => dispatch(stopEngine)}
     >
       <Vehicle />
       <Platform />
-      <TestComponent value="Game child" />
+      <button onClick={() => dispatch(restart)}>restart</button>
     </div>
   );
 });
-
-function TestComponent({ value }: { value: String }) {
-  console.log(value);
-  return <span />;
-}
 
 function App() {
   const [state, dispatch] = useGameLoop();
