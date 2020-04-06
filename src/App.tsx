@@ -1,31 +1,9 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useReducer,
-  createContext,
-  memo,
-  useContext
-} from "react";
+import React, { createContext, memo, useContext } from "react";
 import "./App.css";
-import { initialGameState, gameReducer, GameState, Action } from "./gameState";
+import { initialGameState, GameAction, useGameLoop } from "./gameLoop";
 
-const DispatchContext = createContext((action: Action) => {});
+const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
-
-function useAnimationFrame() {
-  const [timestamp, setTimestamp] = useState(0);
-  const tick = useCallback(newTimestamp => {
-    setTimestamp(newTimestamp);
-    window.requestAnimationFrame(tick);
-  }, []);
-
-  useEffect(() => {
-    window.requestAnimationFrame(tick);
-  }, [tick]);
-
-  return timestamp;
-}
 
 function Platform() {
   console.log("<Platform/>");
@@ -67,8 +45,7 @@ function TestComponent({ value }: { value: String }) {
 }
 
 function App() {
-  const [state, dispatch] = useReducer(gameReducer, initialGameState);
-  const timestamp = useAnimationFrame();
+  const [state, dispatch] = useGameLoop();
 
   return (
     <DispatchContext.Provider value={dispatch}>
