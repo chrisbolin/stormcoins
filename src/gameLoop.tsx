@@ -1,19 +1,29 @@
 import { useEffect, useCallback, useReducer, Dispatch } from "react";
 
+// PHYSICAL CONSTANTS
+const FORCE_GRAVITY = 0.001; // note: dt is in milliseconds
+const FORCE_ENGINE = FORCE_GRAVITY * 2;
+
+// STATE
 export interface GameState {
   engine: boolean;
   timestamp: number;
-  vehicleX: number;
-  vehicleY: number;
+  positionX: number;
+  positionY: number;
+  velocityX: number;
+  velocityY: number;
 }
 
 export const initialGameState: GameState = {
   engine: false,
   timestamp: 0,
-  vehicleX: 50,
-  vehicleY: 20
+  positionX: 50,
+  positionY: 20,
+  velocityX: 0,
+  velocityY: 0
 };
 
+// ACTIONS
 const TICK = "tick";
 const START_ENGINE = "start_engine";
 const STOP_ENGINE = "stop_engine";
@@ -32,8 +42,24 @@ export type GameAction = TickAction | BasicAction;
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
-      const vehicleY = state.vehicleY + (state.engine ? 1 : -1);
-      return { ...state, timestamp: action.timestamp, vehicleY };
+      const dt = action.timestamp - state.timestamp;
+
+      // velocity
+      const velocityY =
+        state.velocityY +
+        (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
+
+      // position
+      const positionX = state.positionX + state.velocityX;
+      const positionY = state.positionY + state.velocityY;
+
+      return {
+        ...state,
+        timestamp: action.timestamp,
+        positionX,
+        positionY,
+        velocityY
+      };
     case START_ENGINE:
       return { ...state, engine: true };
     case STOP_ENGINE:

@@ -11,11 +11,11 @@ function Platform() {
 }
 
 function Vehicle() {
-  const { engine, vehicleX, vehicleY } = useContext(StateContext);
+  const { engine, positionX, positionY } = useContext(StateContext);
   return (
     <div
       className="vehicle"
-      style={{ left: `${vehicleX}vw`, bottom: `${vehicleY}vw` }}
+      style={{ left: `${positionX}vw`, bottom: `${positionY}vw` }}
     >
       helicopter
       <br />
