@@ -1,6 +1,17 @@
-import React, { useState, useEffect, useCallback, useReducer } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  createContext,
+  memo,
+  useContext
+} from "react";
 import "./App.css";
-import { initialGameState, gameReducer, GameState } from "./gameState";
+import { initialGameState, gameReducer, GameState, Action } from "./gameState";
+
+const DispatchContext = createContext((action: Action) => {});
+const StateContext = createContext(initialGameState);
 
 function useAnimationFrame() {
   const [timestamp, setTimestamp] = useState(0);
@@ -16,38 +27,57 @@ function useAnimationFrame() {
   return timestamp;
 }
 
-function Helicopter({ gameState }: { gameState: GameState }) {
-  const timestamp = useAnimationFrame();
+function Platform() {
+  console.log("<Platform/>");
+  return <div className="platform">platform</div>;
+}
 
+function Helicopter() {
+  const { engine } = useContext(StateContext);
   return (
     <div className="helicopter">
       helicopter
       <br />
-      {gameState.engine ? "ON" : ""}
+      {engine ? "ON" : ""}
       <br />
-      {timestamp}
     </div>
   );
 }
 
-function App() {
-  const [state, dispatch] = useReducer(gameReducer, initialGameState);
-
-  console.log(state);
-
+const Game = memo(function() {
+  const dispatch = useContext(DispatchContext);
   return (
     <div
-      className="App"
+      className="game"
       onMouseDown={() => dispatch({ type: "start_engine" })}
       onMouseUp={() => dispatch({ type: "stop_engine" })}
       onTouchStart={() => dispatch({ type: "start_engine" })}
       onTouchEnd={() => dispatch({ type: "stop_engine" })}
     >
-      <div className="game">
-        <Helicopter gameState={state} />
-        <div className="platform">platform</div>
-      </div>
+      <Helicopter />
+      <Platform />
+      <TestComponent value="Game child" />
     </div>
+  );
+});
+
+function TestComponent({ value }: { value: String }) {
+  console.log(value);
+  return <span />;
+}
+
+function App() {
+  const [state, dispatch] = useReducer(gameReducer, initialGameState);
+  const timestamp = useAnimationFrame();
+
+  return (
+    <DispatchContext.Provider value={dispatch}>
+      <StateContext.Provider value={state}>
+        <div className="App">
+          <Game />
+        </div>
+      </StateContext.Provider>
+    </DispatchContext.Provider>
   );
 }
 
