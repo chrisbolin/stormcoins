@@ -3,6 +3,7 @@ import { useEffect, useCallback, useReducer, Dispatch } from "react";
 // PHYSICAL CONSTANTS
 const FORCE_GRAVITY = 4.5 / 100000; // note: dt is in milliseconds, so this constant needs to be very small
 const FORCE_ENGINE = 2.5 * FORCE_GRAVITY;
+const DRAG_COEFFICIENT = 1 / 100;
 
 // STATE
 export interface GameState {
@@ -22,7 +23,7 @@ export const initialGameState: GameState = {
   positionY: 30,
   velocityX: 0,
   velocityY: 0,
-  windVelocityX: 0.02
+  windVelocityX: 0.08
 };
 
 // ACTIONS
@@ -54,9 +55,16 @@ export function gameReducer(state: GameState, action: GameAction) {
       const velocityY =
         state.velocityY +
         (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
-      const velocityX = state.windVelocityX;
+
+      const relativeWindVelocityX = state.windVelocityX - state.velocityX;
+      const velocityX =
+        state.velocityX +
+        Math.pow(relativeWindVelocityX, 2) *
+          Math.sign(relativeWindVelocityX) *
+          DRAG_COEFFICIENT *
+          dt;
       // position
-      const positionX = (state.positionX + dt * state.velocityX) % 100;
+      const positionX = (state.positionX + dt * state.velocityX + 100) % 100; // wrap x around with (x + 100) % 100
       const positionY = state.positionY + dt * state.velocityY;
       return {
         ...state,
