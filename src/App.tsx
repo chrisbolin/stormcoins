@@ -26,6 +26,11 @@ function Vehicle() {
   );
 }
 
+function Debug() {
+  const state = useContext(StateContext);
+  return <pre style={{ margin: 0 }}>{JSON.stringify(state, null, 2)}</pre>;
+}
+
 const Game = memo(function() {
   const dispatch = useContext(DispatchContext);
   return (
@@ -36,6 +41,7 @@ const Game = memo(function() {
       onTouchStart={() => dispatch(startEngine)}
       onTouchEnd={() => dispatch(stopEngine)}
     >
+      <Debug />
       <Vehicle />
       <Platform />
       <button onClick={() => dispatch(restart)}>restart</button>
