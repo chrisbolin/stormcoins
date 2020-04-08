@@ -14,6 +14,7 @@ import {
   startEngine,
   stopEngine
 } from "./gameLoop";
+import { PLATFORM_LEFT, PLATFORM_WIDTH } from "./constants";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
@@ -41,7 +42,15 @@ function addGlobalListeners(dispatch: Dispatch<GameAction>) {
 }
 
 function Platform() {
-  return <div className="platform"></div>;
+  return (
+    <div
+      className="platform"
+      style={{
+        left: `${PLATFORM_LEFT}vw`,
+        width: `${PLATFORM_WIDTH}vw`
+      }}
+    ></div>
+  );
 }
 
 function Vehicle() {
@@ -69,10 +78,10 @@ const Game = memo(function() {
 
   return (
     <div className="game">
-      <Debug />
-      <Vehicle />
-      <Platform />
       <button onClick={() => dispatch(restart)}>restart</button>
+      <Debug />
+      <Platform />
+      <Vehicle />
     </div>
   );
 });

@@ -15,10 +15,8 @@
 
 .platform {
   position: absolute;
-  width: 20vw;
   height: 2vw;
-  bottom: 0;
-  left: 30vw;
+  bottom: -1vw;
   background-color: grey;
 }
 
