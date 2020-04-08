@@ -7,7 +7,8 @@ import {
   PLATFORM_LEFT,
   PLATFORM_WIDTH,
   VEHICLE_WIDTH,
-  VEHICLE_CRASH_VELOCITY
+  VEHICLE_CRASH_VELOCITY,
+  VEHICLE_MAX_ALTITUDE
 } from "./constants";
 
 // STATE
@@ -82,7 +83,10 @@ export function gameReducer(state: GameState, action: GameAction) {
         positionY = 0;
         velocityY = 0;
         velocityX = state.velocityX * (1 - COEFFICIENT_FRICTION);
-      } else if (state.positionY < 0) {
+      } else if (
+        state.positionY < 0 ||
+        state.positionY > VEHICLE_MAX_ALTITUDE
+      ) {
         // crashed
         return {
           ...initialGameState

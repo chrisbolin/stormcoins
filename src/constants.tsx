@@ -10,3 +10,4 @@ export const PLATFORM_WIDTH = 30;
 export const VEHICLE_WIDTH = 10;
 export const VEHICLE_HEIGHT = 6;
 export const VEHICLE_CRASH_VELOCITY = 0.04;
+export const VEHICLE_MAX_ALTITUDE = 1000;
