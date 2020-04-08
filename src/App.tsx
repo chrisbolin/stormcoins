@@ -1,13 +1,6 @@
 import React, { createContext, memo, useContext } from "react";
 import "./App.css";
-import {
-  initialGameState,
-  GameAction,
-  useGameLoop,
-  startEngine,
-  stopEngine,
-  restart
-} from "./gameLoop";
+import { initialGameState, GameAction, useGameLoop, restart } from "./gameLoop";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);

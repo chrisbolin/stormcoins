@@ -7,6 +7,7 @@ const DRAG_COEFFICIENT = 1 / 100;
 
 // STATE
 export interface GameState {
+  paused: boolean;
   engine: boolean;
   timestamp: number;
   positionX: number;
@@ -17,6 +18,7 @@ export interface GameState {
 }
 
 export const initialGameState: GameState = {
+  paused: true,
   engine: false,
   timestamp: 0,
   positionX: 50,
@@ -50,6 +52,13 @@ export const restart: GameAction = { type: RESTART };
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
+      if (state.paused) {
+        return {
+          ...state,
+          timestamp: action.timestamp
+        };
+      }
+
       const dt = action.timestamp - state.timestamp;
       // velocity
       const velocityY =
@@ -75,11 +84,11 @@ export function gameReducer(state: GameState, action: GameAction) {
         velocityY
       };
     case START_ENGINE:
-      return { ...state, engine: true };
+      return { ...state, paused: false, engine: true };
     case STOP_ENGINE:
       return { ...state, engine: false };
     case RESTART:
-      return { ...initialGameState, timestamp: state.timestamp };
+      return { ...initialGameState };
     default:
       throw new Error(`Invalid action: ${JSON.stringify(action)}`);
   }
