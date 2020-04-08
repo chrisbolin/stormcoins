@@ -100,21 +100,31 @@ function Coin() {
 
 function Debug() {
   const state = useContext(StateContext);
+  if (window.location.port !== "3000") return null;
   return <pre style={{ margin: 0 }}>{JSON.stringify(state, null, 2)}</pre>;
 }
 
-function Instructions() {
+function Dashboard() {
+  const { paused, score, windVelocityX } = useContext(StateContext);
+  if (paused)
+    return (
+      <h3>
+        Goal: get coin, land, repeat.
+        <br />
+        Engine: any key, click, or touch anywhere.
+        <br />
+        There are no other controls.
+        <br />
+        The wind will push you, like it or not.
+        <br />
+        Don't land too hard pls.
+      </h3>
+    );
   return (
     <h3>
-      Goal: get coin, land, repeat.
+      score: {score}
       <br />
-      Engine: any key, click, or touch anywhere.
-      <br />
-      There are no other controls.
-      <br />
-      The wind will push you, like it or not.
-      <br />
-      Don't land too hard pls.
+      wind: {Math.round(windVelocityX * 1000)}
     </h3>
   );
 }
@@ -135,7 +145,7 @@ const Scene = memo(function() {
         width: `${SCENE_WIDTH}vw`
       }}
     >
-      <Instructions />
+      <Dashboard />
       <Debug />
       <Platform />
       <Coin />

@@ -4,6 +4,13 @@ h3 {
   color: white;
 }
 
+h3 {
+  font-size: 3vw;
+}
+pre {
+  font-size: 1vw;
+}
+
 .App {
   position: absolute;
   height: 100vh;
