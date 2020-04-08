@@ -22,7 +22,5 @@
 
 .vehicle {
   position: absolute;
-  width: 10vw;
-  height: 10vw;
   background-color: yellowgreen;
 }

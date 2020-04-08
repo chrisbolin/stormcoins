@@ -14,7 +14,12 @@ import {
   startEngine,
   stopEngine
 } from "./gameLoop";
-import { PLATFORM_LEFT, PLATFORM_WIDTH } from "./constants";
+import {
+  PLATFORM_LEFT,
+  PLATFORM_WIDTH,
+  VEHICLE_WIDTH,
+  VEHICLE_HEIGHT
+} from "./constants";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
@@ -49,7 +54,7 @@ function Platform() {
         left: `${PLATFORM_LEFT}vw`,
         width: `${PLATFORM_WIDTH}vw`
       }}
-    ></div>
+    />
   );
 }
 
@@ -58,8 +63,13 @@ function Vehicle() {
   return (
     <div
       className="vehicle"
-      style={{ left: `${positionX}vw`, bottom: `${positionY}vw` }}
-    ></div>
+      style={{
+        left: `${positionX}vw`,
+        bottom: `${positionY}vw`,
+        width: `${VEHICLE_WIDTH}vw`,
+        height: `${VEHICLE_HEIGHT}vw`
+      }}
+    />
   );
 }
 
