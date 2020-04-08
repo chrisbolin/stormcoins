@@ -34,13 +34,7 @@ function Debug() {
 const Game = memo(function() {
   const dispatch = useContext(DispatchContext);
   return (
-    <div
-      className="game"
-      onMouseDown={() => dispatch(startEngine)}
-      onMouseUp={() => dispatch(stopEngine)}
-      onTouchStart={() => dispatch(startEngine)}
-      onTouchEnd={() => dispatch(stopEngine)}
-    >
+    <div className="game">
       <Debug />
       <Vehicle />
       <Platform />
