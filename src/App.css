@@ -22,5 +22,10 @@
 
 .vehicle {
   position: absolute;
-  background-color: yellowgreen;
+  background-color: lightblue;
+}
+
+.coin {
+  position: absolute;
+  background-color: yellow;
 }

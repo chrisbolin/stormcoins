@@ -13,6 +13,7 @@ import {
 
 // STATE
 export interface GameState {
+  score: number;
   paused: boolean;
   engine: boolean;
   timestamp: number;
@@ -20,10 +21,13 @@ export interface GameState {
   positionY: number;
   velocityX: number;
   velocityY: number;
+  coinX: number;
+  coinY: number;
   windVelocityX: number;
 }
 
 export const initialGameState: GameState = {
+  score: 0,
   paused: true,
   engine: false,
   timestamp: 0,
@@ -31,6 +35,8 @@ export const initialGameState: GameState = {
   positionY: 30,
   velocityX: 0,
   velocityY: 0,
+  coinX: 30,
+  coinY: 35,
   windVelocityX: 0.09
 };
 

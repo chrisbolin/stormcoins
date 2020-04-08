@@ -18,7 +18,9 @@ import {
   PLATFORM_LEFT,
   PLATFORM_WIDTH,
   VEHICLE_WIDTH,
-  VEHICLE_HEIGHT
+  VEHICLE_HEIGHT,
+  COIN_HEIGHT,
+  COIN_WIDTH
 } from "./constants";
 
 const DispatchContext = createContext((action: GameAction) => {});
@@ -73,6 +75,21 @@ function Vehicle() {
   );
 }
 
+function Coin() {
+  const { coinX, coinY } = useContext(StateContext);
+  return (
+    <div
+      className="coin"
+      style={{
+        left: `${coinX}vw`,
+        bottom: `${coinY}vw`,
+        width: `${COIN_WIDTH}vw`,
+        height: `${COIN_HEIGHT}vw`
+      }}
+    />
+  );
+}
+
 function Debug() {
   const state = useContext(StateContext);
   return <pre style={{ margin: 0 }}>{JSON.stringify(state, null, 2)}</pre>;
@@ -91,6 +108,7 @@ const Game = memo(function() {
       <button onClick={() => dispatch(restart)}>restart</button>
       <Debug />
       <Platform />
+      <Coin />
       <Vehicle />
     </div>
   );
