@@ -1,3 +1,9 @@
+pre,
+h3 {
+  margin: 0;
+  color: white;
+}
+
 .App {
   position: absolute;
   height: 100vh;
@@ -5,10 +11,8 @@
   overflow: hidden;
 }
 
-.game {
+.scene {
   position: relative;
-  width: 100vw;
-  height: 45vw;
   background-color: #333;
   user-select: none;
 }

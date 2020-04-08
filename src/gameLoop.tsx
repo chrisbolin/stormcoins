@@ -8,7 +8,14 @@ import {
   PLATFORM_WIDTH,
   VEHICLE_WIDTH,
   VEHICLE_CRASH_VELOCITY,
-  VEHICLE_MAX_ALTITUDE
+  VEHICLE_MAX_ALTITUDE,
+  COIN_WIDTH,
+  COIN_HEIGHT,
+  VEHICLE_ZERO_VELOCITY,
+  SCENE_WIDTH,
+  SCENE_HEIGHT,
+  INITIAL_WIND_VELOCITY_X,
+  WIND_INCREMENT
 } from "./constants";
 
 // STATE
@@ -21,6 +28,7 @@ export interface GameState {
   positionY: number;
   velocityX: number;
   velocityY: number;
+  coinVisible: boolean;
   coinX: number;
   coinY: number;
   windVelocityX: number;
@@ -35,9 +43,10 @@ export const initialGameState: GameState = {
   positionY: 30,
   velocityX: 0,
   velocityY: 0,
+  coinVisible: true,
   coinX: 30,
   coinY: 35,
-  windVelocityX: 0.09
+  windVelocityX: INITIAL_WIND_VELOCITY_X
 };
 
 // ACTIONS
@@ -64,13 +73,20 @@ export const restart: GameAction = { type: RESTART };
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
+      let {
+        coinVisible,
+        score,
+        positionX,
+        positionY,
+        velocityX,
+        velocityY,
+        coinX,
+        coinY,
+        windVelocityX
+      } = state;
       const dt = action.timestamp - state.timestamp;
-      const relativeWindVelocityX = state.windVelocityX - state.velocityX;
 
-      const positionX = (state.positionX + dt * state.velocityX + 100) % 100; // wrap x around with (x + 100) % 100;
-      let positionY = 0;
-      let velocityX = 0;
-      let velocityY = 0;
+      positionX = (positionX + dt * velocityX + SCENE_WIDTH) % SCENE_WIDTH; // wrap x around with (x + width) % width;
 
       // paused
       if (state.paused) {
@@ -78,6 +94,17 @@ export function gameReducer(state: GameState, action: GameAction) {
           ...state,
           timestamp: action.timestamp
         };
+      } else if (
+        // completely landed after getting coin
+        !state.coinVisible &&
+        state.positionY === 0 &&
+        Math.abs(state.velocityX) < VEHICLE_ZERO_VELOCITY
+      ) {
+        coinVisible = true;
+        velocityX = 0;
+        coinX = (coinX + SCENE_WIDTH * 0.7) % (SCENE_WIDTH * 0.9);
+        coinY = (coinY + SCENE_HEIGHT * 0.25) % (SCENE_HEIGHT * 0.9);
+        windVelocityX = windVelocityX * WIND_INCREMENT;
       } else if (
         // landing
         !state.engine &&
@@ -99,6 +126,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         };
       } else {
         // flying
+        const relativeWindVelocityX = windVelocityX - velocityX;
         velocityY =
           state.velocityY +
           (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
@@ -111,13 +139,30 @@ export function gameReducer(state: GameState, action: GameAction) {
         positionY = state.positionY + dt * state.velocityY;
       }
 
+      if (
+        coinVisible &&
+        state.positionX - state.coinX < COIN_WIDTH &&
+        state.coinX - state.positionX < VEHICLE_WIDTH &&
+        state.positionY - state.coinY < COIN_HEIGHT &&
+        state.coinY - state.positionY < COIN_WIDTH
+      ) {
+        // picked up coin
+        coinVisible = false;
+        score += 100;
+      }
+
       return {
         ...state,
         timestamp: action.timestamp,
         positionX,
         positionY,
         velocityX,
-        velocityY
+        velocityY,
+        coinX,
+        coinY,
+        score,
+        coinVisible,
+        windVelocityX
       };
     case START_ENGINE:
       return { ...state, paused: false, engine: true };

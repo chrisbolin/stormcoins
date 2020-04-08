@@ -10,7 +10,6 @@ import {
   initialGameState,
   GameAction,
   useGameLoop,
-  restart,
   startEngine,
   stopEngine
 } from "./gameLoop";
@@ -20,7 +19,9 @@ import {
   VEHICLE_WIDTH,
   VEHICLE_HEIGHT,
   COIN_HEIGHT,
-  COIN_WIDTH
+  COIN_WIDTH,
+  SCENE_HEIGHT,
+  SCENE_WIDTH
 } from "./constants";
 
 const DispatchContext = createContext((action: GameAction) => {});
@@ -56,7 +57,9 @@ function Platform() {
         left: `${PLATFORM_LEFT}vw`,
         width: `${PLATFORM_WIDTH}vw`
       }}
-    />
+    >
+      platform
+    </div>
   );
 }
 
@@ -71,12 +74,15 @@ function Vehicle() {
         width: `${VEHICLE_WIDTH}vw`,
         height: `${VEHICLE_HEIGHT}vw`
       }}
-    />
+    >
+      helicopter
+    </div>
   );
 }
 
 function Coin() {
-  const { coinX, coinY } = useContext(StateContext);
+  const { coinX, coinY, coinVisible } = useContext(StateContext);
+  if (!coinVisible) return null;
   return (
     <div
       className="coin"
@@ -86,7 +92,9 @@ function Coin() {
         width: `${COIN_WIDTH}vw`,
         height: `${COIN_HEIGHT}vw`
       }}
-    />
+    >
+      coin
+    </div>
   );
 }
 
@@ -95,7 +103,23 @@ function Debug() {
   return <pre style={{ margin: 0 }}>{JSON.stringify(state, null, 2)}</pre>;
 }
 
-const Game = memo(function() {
+function Instructions() {
+  return (
+    <h3>
+      Goal: get coin, land, repeat.
+      <br />
+      Engine: any key, click, or touch anywhere.
+      <br />
+      There are no other controls.
+      <br />
+      The wind will push you, like it or not.
+      <br />
+      Don't land too hard pls.
+    </h3>
+  );
+}
+
+const Scene = memo(function() {
   const dispatch = useContext(DispatchContext);
 
   useEffect(() => {
@@ -104,8 +128,14 @@ const Game = memo(function() {
   }, [dispatch]);
 
   return (
-    <div className="game">
-      <button onClick={() => dispatch(restart)}>restart</button>
+    <div
+      className="scene"
+      style={{
+        height: `${SCENE_HEIGHT}vw`,
+        width: `${SCENE_WIDTH}vw`
+      }}
+    >
+      <Instructions />
       <Debug />
       <Platform />
       <Coin />
@@ -121,7 +151,7 @@ function App() {
     <DispatchContext.Provider value={dispatch}>
       <StateContext.Provider value={state}>
         <div className="App">
-          <Game />
+          <Scene />
         </div>
       </StateContext.Provider>
     </DispatchContext.Provider>
