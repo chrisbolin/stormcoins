@@ -94,28 +94,6 @@ export function gameReducer(state: GameState, action: GameAction) {
   }
 }
 
-function addListenerToMultipleEvents(types: string[], listener: () => any) {
-  types.forEach(type => window.addEventListener(type, listener));
-  return () =>
-    types.forEach(type => window.removeEventListener(type, listener));
-}
-
-function addGlobalListeners(dispatch: Dispatch<GameAction>) {
-  const removeStartListener = addListenerToMultipleEvents(
-    ["mousedown", "keydown", "touchstart"],
-    () => dispatch(startEngine)
-  );
-  const removeStopListeners = addListenerToMultipleEvents(
-    ["mouseup", "keyup", "touchend"],
-    () => dispatch(stopEngine)
-  );
-
-  return () => {
-    removeStartListener();
-    removeStopListeners();
-  };
-}
-
 export function useGameLoop(): [GameState, Dispatch<GameAction>] {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   const tick = useCallback(newTimestamp => {
@@ -126,11 +104,6 @@ export function useGameLoop(): [GameState, Dispatch<GameAction>] {
   useEffect(() => {
     window.requestAnimationFrame(tick);
   }, [tick]);
-
-  useEffect(() => {
-    const removeGlobalListeners = addGlobalListeners(dispatch);
-    return removeGlobalListeners;
-  }, [dispatch]);
 
   return [state, dispatch];
 }

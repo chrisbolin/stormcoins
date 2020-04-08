@@ -1,9 +1,44 @@
-import React, { createContext, memo, useContext } from "react";
+import React, {
+  createContext,
+  memo,
+  useContext,
+  useEffect,
+  Dispatch
+} from "react";
 import "./App.css";
-import { initialGameState, GameAction, useGameLoop, restart } from "./gameLoop";
+import {
+  initialGameState,
+  GameAction,
+  useGameLoop,
+  restart,
+  startEngine,
+  stopEngine
+} from "./gameLoop";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
+
+function addListenerToMultipleEvents(types: string[], listener: () => any) {
+  types.forEach(type => window.addEventListener(type, listener));
+  return () =>
+    types.forEach(type => window.removeEventListener(type, listener));
+}
+
+function addGlobalListeners(dispatch: Dispatch<GameAction>) {
+  const removeStartListener = addListenerToMultipleEvents(
+    ["mousedown", "keydown", "touchstart"],
+    () => dispatch(startEngine)
+  );
+  const removeStopListeners = addListenerToMultipleEvents(
+    ["mouseup", "keyup", "touchend"],
+    () => dispatch(stopEngine)
+  );
+
+  return () => {
+    removeStartListener();
+    removeStopListeners();
+  };
+}
 
 function Platform() {
   return <div className="platform"></div>;
@@ -26,6 +61,12 @@ function Debug() {
 
 const Game = memo(function() {
   const dispatch = useContext(DispatchContext);
+
+  useEffect(() => {
+    const removeGlobalListeners = addGlobalListeners(dispatch);
+    return removeGlobalListeners;
+  }, [dispatch]);
+
   return (
     <div className="game">
       <Debug />
