@@ -119,7 +119,8 @@ export function useGameLoop(): [GameState, Dispatch<GameAction>] {
   }, [tick]);
 
   useEffect(() => {
-    addGlobalListeners(dispatch);
+    const removeGlobalListeners = addGlobalListeners(dispatch);
+    return removeGlobalListeners;
   }, [dispatch]);
 
   return [state, dispatch];
