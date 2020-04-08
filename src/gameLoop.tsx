@@ -59,6 +59,12 @@ export function gameReducer(state: GameState, action: GameAction) {
         };
       }
 
+      if (state.positionY < 0) {
+        return {
+          ...initialGameState
+        };
+      }
+
       const dt = action.timestamp - state.timestamp;
       // velocity
       const velocityY =
