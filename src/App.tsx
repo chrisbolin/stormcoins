@@ -151,13 +151,6 @@ function Dashboard() {
 }
 
 const Scene = memo(function() {
-  const dispatch = useContext(DispatchContext);
-
-  useEffect(() => {
-    const removeGlobalListeners = addGlobalListeners(dispatch);
-    return removeGlobalListeners;
-  }, [dispatch]);
-
   return (
     <div
       className="scene"
@@ -175,8 +168,30 @@ const Scene = memo(function() {
   );
 });
 
+function getLocalStorageNumber(key: string): number {
+  return parseFloat(localStorage.getItem(key) || "") || 0;
+}
+
+function setLocalStorageNumber(key: string, x: number): void {
+  localStorage.setItem(key, x.toString());
+}
+
 function App() {
-  const [state, dispatch] = useGameLoop();
+  const [state, dispatch] = useGameLoop(() => {
+    const bestScore = getLocalStorageNumber("bestScore");
+    const lastScore = getLocalStorageNumber("lastScore");
+    return { bestScore, lastScore };
+  });
+
+  useEffect(() => {
+    const removeGlobalListeners = addGlobalListeners(dispatch);
+    return removeGlobalListeners;
+  }, [dispatch]);
+
+  useEffect(() => {
+    setLocalStorageNumber("bestScore", state.bestScore);
+    setLocalStorageNumber("lastScore", state.lastScore);
+  }, [state.lastScore, state.bestScore]);
 
   return (
     <DispatchContext.Provider value={dispatch}>

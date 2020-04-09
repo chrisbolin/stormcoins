@@ -36,6 +36,11 @@ export interface GameState {
   windVelocityX: number;
 }
 
+export interface PersistedGameState {
+  lastScore: number;
+  bestScore: number;
+}
+
 export const initialGameState: GameState = {
   score: 0,
   lastScore: 0,
@@ -181,8 +186,13 @@ export function gameReducer(state: GameState, action: GameAction) {
   }
 }
 
-export function useGameLoop(): [GameState, Dispatch<GameAction>] {
-  const [state, dispatch] = useReducer(gameReducer, initialGameState);
+export function useGameLoop(
+  getPersistedGameState: () => PersistedGameState
+): [GameState, Dispatch<GameAction>] {
+  const [state, dispatch] = useReducer(gameReducer, null, () => ({
+    ...initialGameState,
+    ...getPersistedGameState()
+  }));
   const tick = useCallback(newTimestamp => {
     dispatch({ type: TICK, timestamp: newTimestamp });
     window.requestAnimationFrame(tick);
