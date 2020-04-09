@@ -108,6 +108,22 @@ function Debug() {
   );
 }
 
+function Instructions() {
+  return (
+    <h3>
+      Goal: get coin, land, repeat.
+      <br />
+      Engine: any key, click, or touch anywhere.
+      <br />
+      There are no other controls.
+      <br />
+      The wind will push you, like it or not.
+      <br />
+      Don't land too hard pls.
+    </h3>
+  );
+}
+
 function Dashboard() {
   const {
     paused,
@@ -117,30 +133,20 @@ function Dashboard() {
     windVelocityX,
     velocityX
   } = useContext(StateContext);
-  if (paused)
-    return (
-      <h3>
-        Goal: get coin, land, repeat.
-        <br />
-        Engine: any key, click, or touch anywhere.
-        <br />
-        There are no other controls.
-        <br />
-        The wind will push you, like it or not.
-        <br />
-        Don't land too hard pls.
-      </h3>
-    );
+
   return (
-    <h3>
-      score: {score}
-      <br />
-      best: {bestScore}; last: {lastScore}
-      <br />
-      speed: {Math.round(velocityX * 1000)}
-      <br />
-      wind speed: {Math.round(windVelocityX * 1000)}
-    </h3>
+    <>
+      <h3>
+        score: {score}
+        <br />
+        best: {bestScore}; last: {lastScore}
+        <br />
+        speed: {Math.round(velocityX * 1000)}
+        <br />
+        wind speed: {Math.round(windVelocityX * 1000)}
+      </h3>
+      {paused && <Instructions />}
+    </>
   );
 }
 
