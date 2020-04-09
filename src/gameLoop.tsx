@@ -21,6 +21,8 @@ import {
 // STATE
 export interface GameState {
   score: number;
+  lastScore: number;
+  bestScore: number;
   paused: boolean;
   engine: boolean;
   timestamp: number;
@@ -36,6 +38,8 @@ export interface GameState {
 
 export const initialGameState: GameState = {
   score: 0,
+  lastScore: 0,
+  bestScore: 0,
   paused: true,
   engine: false,
   timestamp: 0,
@@ -122,7 +126,9 @@ export function gameReducer(state: GameState, action: GameAction) {
       ) {
         // crashed
         return {
-          ...initialGameState
+          ...initialGameState,
+          lastScore: score,
+          bestScore: score > state.bestScore ? score : state.bestScore
         };
       } else {
         // flying

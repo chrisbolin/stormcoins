@@ -101,11 +101,22 @@ function Coin() {
 function Debug() {
   const state = useContext(StateContext);
   if (window.location.port !== "3000") return null;
-  return <pre style={{ margin: 0 }}>{JSON.stringify(state, null, 2)}</pre>;
+  return (
+    <pre style={{ margin: 0, position: "absolute", bottom: 0, left: 0 }}>
+      {JSON.stringify(state, null, 2)}
+    </pre>
+  );
 }
 
 function Dashboard() {
-  const { paused, score, windVelocityX } = useContext(StateContext);
+  const {
+    paused,
+    score,
+    bestScore,
+    lastScore,
+    windVelocityX,
+    velocityX
+  } = useContext(StateContext);
   if (paused)
     return (
       <h3>
@@ -124,7 +135,11 @@ function Dashboard() {
     <h3>
       score: {score}
       <br />
-      wind: {Math.round(windVelocityX * 1000)}
+      best: {bestScore}; last: {lastScore}
+      <br />
+      speed: {Math.round(velocityX * 1000)}
+      <br />
+      wind speed: {Math.round(windVelocityX * 1000)}
     </h3>
   );
 }
