@@ -5,7 +5,7 @@ export const COEFFICIENT_DRAG = 0.01;
 export const COEFFICIENT_FRICTION = 0.1;
 
 // SCENE
-export const SCENE_HEIGHT = 45;
+export const SCENE_HEIGHT = 42;
 export const SCENE_WIDTH = 100;
 
 // FURNITURE

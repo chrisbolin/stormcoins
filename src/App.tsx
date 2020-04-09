@@ -39,7 +39,7 @@ function addGlobalListeners(dispatch: Dispatch<GameAction>) {
     () => dispatch(startEngine)
   );
   const removeStopListeners = addListenerToMultipleEvents(
-    ["mouseup", "keyup", "touchend"],
+    ["mouseup", "keyup", "touchend", "touchcancel", "touchmove"],
     () => dispatch(stopEngine)
   );
 
