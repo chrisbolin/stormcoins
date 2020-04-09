@@ -40,3 +40,18 @@ pre {
   position: absolute;
   background-color: yellow;
 }
+
+.ViewportWarning {
+  position: fixed;
+  bottom: 0;
+  background-color: darkred;
+  color: white;
+  padding: 2em;
+  width: 100vw;
+}
+
+@media (min-height: 42vw) {
+  .ViewportWarning {
+    display: none;
+  }
+}

@@ -150,6 +150,14 @@ function Dashboard() {
   );
 }
 
+function ViewportWarning() {
+  return (
+    <div className="ViewportWarning">
+      <h3>Can you make your browser taller? You can't see all of the game.</h3>
+    </div>
+  );
+}
+
 const Scene = memo(function() {
   return (
     <div
@@ -164,6 +172,7 @@ const Scene = memo(function() {
       <Platform />
       <Coin />
       <Vehicle />
+      <ViewportWarning />
     </div>
   );
 });
