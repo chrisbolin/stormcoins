@@ -14,8 +14,8 @@ import {
   VEHICLE_ZERO_VELOCITY,
   SCENE_WIDTH,
   SCENE_HEIGHT,
-  INITIAL_WIND_VELOCITY_X,
-  WIND_INCREMENT
+  WIND_VELOCITY_X_INITIAL,
+  WIND_VELOCITY_X_INCREMENTAL
 } from "./constants";
 
 // STATE
@@ -46,7 +46,7 @@ export const initialGameState: GameState = {
   coinVisible: true,
   coinX: 30,
   coinY: 35,
-  windVelocityX: INITIAL_WIND_VELOCITY_X
+  windVelocityX: WIND_VELOCITY_X_INITIAL
 };
 
 // ACTIONS
@@ -104,7 +104,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         velocityX = 0;
         coinX = (coinX + SCENE_WIDTH * 0.7) % (SCENE_WIDTH * 0.9);
         coinY = (coinY + SCENE_HEIGHT * 0.25) % (SCENE_HEIGHT * 0.9);
-        windVelocityX = windVelocityX * WIND_INCREMENT;
+        windVelocityX = windVelocityX + WIND_VELOCITY_X_INCREMENTAL;
       } else if (
         // landing
         !state.engine &&

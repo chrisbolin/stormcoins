@@ -17,10 +17,10 @@ export const COIN_HEIGHT = 8;
 // VEHICLE
 export const VEHICLE_WIDTH = 10;
 export const VEHICLE_HEIGHT = 6;
-export const VEHICLE_CRASH_VELOCITY = 0.04;
+export const VEHICLE_CRASH_VELOCITY = 0.05;
 export const VEHICLE_ZERO_VELOCITY = 1e-4;
 export const VEHICLE_MAX_ALTITUDE = 1000;
 
 // WIND
-export const INITIAL_WIND_VELOCITY_X = 0.04;
-export const WIND_INCREMENT = 1.1;
+export const WIND_VELOCITY_X_INITIAL = 4 / 100;
+export const WIND_VELOCITY_X_INCREMENTAL = 5 / 1000;
