@@ -34,13 +34,11 @@ function addListenerToMultipleEvents(types: string[], listener: () => any) {
 }
 
 function addGlobalListeners(dispatch: Dispatch<GameAction>) {
-  const removeStartListener = addListenerToMultipleEvents(
-    ["mousedown", "keydown", "touchstart"],
-    () => dispatch(startEngine)
+  const removeStartListener = addListenerToMultipleEvents(["keydown"], () =>
+    dispatch(startEngine)
   );
-  const removeStopListeners = addListenerToMultipleEvents(
-    ["mouseup", "keyup", "touchend", "touchcancel", "touchmove"],
-    () => dispatch(stopEngine)
+  const removeStopListeners = addListenerToMultipleEvents(["keyup"], () =>
+    dispatch(stopEngine)
   );
 
   return () => {
@@ -158,6 +156,17 @@ function ViewportWarning() {
   );
 }
 
+function GamePad() {
+  const dispatch = useContext(DispatchContext);
+  return (
+    <div
+      className="GamePad"
+      onTouchStart={() => dispatch(startEngine)}
+      onTouchEnd={() => dispatch(stopEngine)}
+    />
+  );
+}
+
 const Scene = memo(function () {
   return (
     <div
@@ -173,6 +182,7 @@ const Scene = memo(function () {
       <Coin />
       <Vehicle />
       <ViewportWarning />
+      <GamePad />
     </div>
   );
 });
