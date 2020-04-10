@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/stormcoins/precache-manifest.d9e2b9d0cbb4186e61eeaea1a42e3b42.js"
+  "/stormcoins/precache-manifest.1d73a1b03143e66ae065d44711736a48.js"
 );
 
 self.addEventListener('message', (event) => {

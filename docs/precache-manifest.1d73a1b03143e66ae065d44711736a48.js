@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "da0145961417e14fc50a1ed4337bf279",
+    "revision": "9026c9978c8c7442497c88df0dedf96a",
     "url": "/stormcoins/index.html"
   },
   {
-    "revision": "504097fef4c7eb44d6f2",
-    "url": "/stormcoins/static/css/main.e2f82415.chunk.css"
+    "revision": "de1d7eb720f46dbf2be7",
+    "url": "/stormcoins/static/css/main.a3192810.chunk.css"
   },
   {
     "revision": "997a8524e23ac1be01ac",
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/stormcoins/static/js/2.75932753.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "504097fef4c7eb44d6f2",
-    "url": "/stormcoins/static/js/main.67e7719f.chunk.js"
+    "revision": "de1d7eb720f46dbf2be7",
+    "url": "/stormcoins/static/js/main.60e058a9.chunk.js"
   },
   {
     "revision": "5285be002c5598d92c0e",
