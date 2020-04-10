@@ -3,7 +3,7 @@ import React, {
   memo,
   useContext,
   useEffect,
-  Dispatch
+  Dispatch,
 } from "react";
 import "./App.css";
 import {
@@ -11,7 +11,7 @@ import {
   GameAction,
   useGameLoop,
   startEngine,
-  stopEngine
+  stopEngine,
 } from "./gameLoop";
 import {
   PLATFORM_LEFT,
@@ -21,16 +21,16 @@ import {
   COIN_HEIGHT,
   COIN_WIDTH,
   SCENE_HEIGHT,
-  SCENE_WIDTH
+  SCENE_WIDTH,
 } from "./constants";
 
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
 
 function addListenerToMultipleEvents(types: string[], listener: () => any) {
-  types.forEach(type => window.addEventListener(type, listener));
+  types.forEach((type) => window.addEventListener(type, listener));
   return () =>
-    types.forEach(type => window.removeEventListener(type, listener));
+    types.forEach((type) => window.removeEventListener(type, listener));
 }
 
 function addGlobalListeners(dispatch: Dispatch<GameAction>) {
@@ -55,7 +55,7 @@ function Platform() {
       className="platform"
       style={{
         left: `${PLATFORM_LEFT}vw`,
-        width: `${PLATFORM_WIDTH}vw`
+        width: `${PLATFORM_WIDTH}vw`,
       }}
     >
       platform
@@ -72,7 +72,7 @@ function Vehicle() {
         left: `${positionX}vw`,
         bottom: `${positionY}vw`,
         width: `${VEHICLE_WIDTH}vw`,
-        height: `${VEHICLE_HEIGHT}vw`
+        height: `${VEHICLE_HEIGHT}vw`,
       }}
     >
       helicopter
@@ -90,7 +90,7 @@ function Coin() {
         left: `${coinX}vw`,
         bottom: `${coinY}vw`,
         width: `${COIN_WIDTH}vw`,
-        height: `${COIN_HEIGHT}vw`
+        height: `${COIN_HEIGHT}vw`,
       }}
     >
       coin
@@ -131,7 +131,7 @@ function Dashboard() {
     bestScore,
     lastScore,
     windVelocityX,
-    velocityX
+    velocityX,
   } = useContext(StateContext);
 
   return (
@@ -158,13 +158,13 @@ function ViewportWarning() {
   );
 }
 
-const Scene = memo(function() {
+const Scene = memo(function () {
   return (
     <div
       className="scene"
       style={{
         height: `${SCENE_HEIGHT}vw`,
-        width: `${SCENE_WIDTH}vw`
+        width: `${SCENE_WIDTH}vw`,
       }}
     >
       <Dashboard />

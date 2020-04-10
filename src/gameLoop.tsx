@@ -15,7 +15,7 @@ import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
   WIND_VELOCITY_X_INITIAL,
-  WIND_VELOCITY_X_INCREMENTAL
+  WIND_VELOCITY_X_INCREMENTAL,
 } from "./constants";
 
 // STATE
@@ -55,7 +55,7 @@ export const initialGameState: GameState = {
   coinVisible: true,
   coinX: 30,
   coinY: 35,
-  windVelocityX: WIND_VELOCITY_X_INITIAL
+  windVelocityX: WIND_VELOCITY_X_INITIAL,
 };
 
 // ACTIONS
@@ -91,7 +91,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         velocityY,
         coinX,
         coinY,
-        windVelocityX
+        windVelocityX,
       } = state;
       const dt = action.timestamp - state.timestamp;
 
@@ -101,7 +101,7 @@ export function gameReducer(state: GameState, action: GameAction) {
       if (state.paused) {
         return {
           ...state,
-          timestamp: action.timestamp
+          timestamp: action.timestamp,
         };
       } else if (
         // completely landed after getting coin
@@ -133,7 +133,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         return {
           ...initialGameState,
           lastScore: score,
-          bestScore: score > state.bestScore ? score : state.bestScore
+          bestScore: score > state.bestScore ? score : state.bestScore,
         };
       } else {
         // flying
@@ -173,7 +173,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         coinY,
         score,
         coinVisible,
-        windVelocityX
+        windVelocityX,
       };
     case START_ENGINE:
       return { ...state, paused: false, engine: true };
@@ -191,9 +191,9 @@ export function useGameLoop(
 ): [GameState, Dispatch<GameAction>] {
   const [state, dispatch] = useReducer(gameReducer, null, () => ({
     ...initialGameState,
-    ...getPersistedGameState()
+    ...getPersistedGameState(),
   }));
-  const tick = useCallback(newTimestamp => {
+  const tick = useCallback((newTimestamp) => {
     dispatch({ type: TICK, timestamp: newTimestamp });
     window.requestAnimationFrame(tick);
   }, []);
