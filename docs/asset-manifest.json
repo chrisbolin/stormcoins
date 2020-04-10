@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/stormcoins/static/css/main.a3192810.chunk.css",
-    "main.js": "/stormcoins/static/js/main.60e058a9.chunk.js",
-    "main.js.map": "/stormcoins/static/js/main.60e058a9.chunk.js.map",
+    "main.js": "/stormcoins/static/js/main.8122cf00.chunk.js",
+    "main.js.map": "/stormcoins/static/js/main.8122cf00.chunk.js.map",
     "runtime-main.js": "/stormcoins/static/js/runtime-main.1c634253.js",
     "runtime-main.js.map": "/stormcoins/static/js/runtime-main.1c634253.js.map",
     "static/js/2.75932753.chunk.js": "/stormcoins/static/js/2.75932753.chunk.js",
     "static/js/2.75932753.chunk.js.map": "/stormcoins/static/js/2.75932753.chunk.js.map",
     "index.html": "/stormcoins/index.html",
-    "precache-manifest.1d73a1b03143e66ae065d44711736a48.js": "/stormcoins/precache-manifest.1d73a1b03143e66ae065d44711736a48.js",
+    "precache-manifest.8a45e59f1e078225c353a660fc262580.js": "/stormcoins/precache-manifest.8a45e59f1e078225c353a660fc262580.js",
     "service-worker.js": "/stormcoins/service-worker.js",
     "static/css/main.a3192810.chunk.css.map": "/stormcoins/static/css/main.a3192810.chunk.css.map",
     "static/js/2.75932753.chunk.js.LICENSE.txt": "/stormcoins/static/js/2.75932753.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.1c634253.js",
     "static/js/2.75932753.chunk.js",
     "static/css/main.a3192810.chunk.css",
-    "static/js/main.60e058a9.chunk.js"
+    "static/js/main.8122cf00.chunk.js"
   ]
 }
