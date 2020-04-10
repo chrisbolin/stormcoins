@@ -1,3 +1,1 @@
 # STORMCOINS
-
-## TODO

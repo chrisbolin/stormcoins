@@ -122,13 +122,9 @@ function Instructions() {
     <h3>
       Goal: get coin, land, repeat.
       <br />
-      Engine: any key, click, or touch anywhere.
+      Control: spacebar [computer] or tap [phone]
       <br />
-      There are no other controls.
-      <br />
-      The wind will push you, like it or not.
-      <br />
-      Don't land too hard pls.
+      The wind will push you. Don't land too hard.
     </h3>
   );
 }
