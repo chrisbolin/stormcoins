@@ -24,21 +24,32 @@ import {
   SCENE_WIDTH,
 } from "./constants";
 
+const SPACE_KEY_CODE = 32;
+
 const DispatchContext = createContext((action: GameAction) => {});
 const StateContext = createContext(initialGameState);
 
-function addListenerToMultipleEvents(types: string[], listener: () => any) {
+function addListenerToMultipleEvents(
+  types: string[],
+  listener: (arg: any) => any
+) {
   types.forEach((type) => window.addEventListener(type, listener));
   return () =>
     types.forEach((type) => window.removeEventListener(type, listener));
 }
 
 function addGlobalListeners(dispatch: Dispatch<GameAction>) {
-  const removeStartListener = addListenerToMultipleEvents(["keydown"], () =>
-    dispatch(startEngine)
+  const removeStartListener = addListenerToMultipleEvents(
+    ["keydown"],
+    (event) => {
+      if (event.keyCode === SPACE_KEY_CODE) dispatch(startEngine);
+    }
   );
-  const removeStopListeners = addListenerToMultipleEvents(["keyup"], () =>
-    dispatch(stopEngine)
+  const removeStopListeners = addListenerToMultipleEvents(
+    ["keyup"],
+    (event) => {
+      if (event.keyCode === SPACE_KEY_CODE) dispatch(stopEngine);
+    }
   );
 
   return () => {
