@@ -74,18 +74,37 @@ function Platform() {
 
 function Vehicle() {
   const { positionX, positionY } = useContext(StateContext);
+  // render two copters, so that when the play "wraps around" the screen it's fluid
+  const leftA = `${positionX}vw`;
+  const leftB = `${positionX - 100}vw`;
+  const bottom = `${positionY}vw`;
+  const width = `${VEHICLE_WIDTH}vw`;
+  const height = `${VEHICLE_HEIGHT}vw`;
   return (
-    <div
-      className="vehicle"
-      style={{
-        left: `${positionX}vw`,
-        bottom: `${positionY}vw`,
-        width: `${VEHICLE_WIDTH}vw`,
-        height: `${VEHICLE_HEIGHT}vw`,
-      }}
-    >
-      helicopter
-    </div>
+    <>
+      <div
+        className="vehicle"
+        style={{
+          left: leftA,
+          bottom,
+          width,
+          height,
+        }}
+      >
+        helicopter
+      </div>
+      <div
+        className="vehicle"
+        style={{
+          left: leftB,
+          bottom,
+          width,
+          height,
+        }}
+      >
+        helicopter
+      </div>
+    </>
   );
 }
 
