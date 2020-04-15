@@ -82,6 +82,7 @@ export const restart: GameAction = { type: RESTART };
 export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case TICK:
+      const { timestamp } = action;
       let {
         coinVisible,
         score,
@@ -93,7 +94,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         coinY,
         windVelocityX,
       } = state;
-      const dt = action.timestamp - state.timestamp;
+      const dt = timestamp - state.timestamp;
 
       positionX = (positionX + dt * velocityX + SCENE_WIDTH) % SCENE_WIDTH; // wrap x around with (x + width) % width;
 
@@ -101,7 +102,7 @@ export function gameReducer(state: GameState, action: GameAction) {
       if (state.paused) {
         return {
           ...state,
-          timestamp: action.timestamp,
+          timestamp,
         };
       } else if (
         // completely landed after getting coin
@@ -134,6 +135,7 @@ export function gameReducer(state: GameState, action: GameAction) {
           ...initialGameState,
           lastScore: score,
           bestScore: score > state.bestScore ? score : state.bestScore,
+          timestamp,
         };
       } else {
         // flying
@@ -164,7 +166,7 @@ export function gameReducer(state: GameState, action: GameAction) {
 
       return {
         ...state,
-        timestamp: action.timestamp,
+        timestamp,
         positionX,
         positionY,
         velocityX,
@@ -180,7 +182,7 @@ export function gameReducer(state: GameState, action: GameAction) {
     case STOP_ENGINE:
       return { ...state, engine: false };
     case RESTART:
-      return { ...initialGameState };
+      return { ...initialGameState, timestamp: state.timestamp };
     default:
       throw new Error(`Invalid action: ${JSON.stringify(action)}`);
   }
