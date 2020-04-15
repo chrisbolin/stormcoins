@@ -113,16 +113,14 @@ function Coin() {
   if (!coinVisible) return null;
   return (
     <div
-      className="coin"
+      className="Coin"
       style={{
         left: `${coinX}vw`,
         bottom: `${coinY}vw`,
         width: `${COIN_WIDTH}vw`,
         height: `${COIN_HEIGHT}vw`,
       }}
-    >
-      coin
-    </div>
+    />
   );
 }
 
