@@ -6,8 +6,11 @@
 # testing
 /coverage
 
-# production
+# built files
 /build
+
+# staging
+/stormcoins
 
 # misc
 .DS_Store

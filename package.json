@@ -20,6 +20,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "deploy": "rm -r docs/; mkdir -p dev/; cp -r build/ docs/",
+    "stage": "rm -r stormcoins/; mkdir -p stormcoins/; cp -r build/ stormcoins/; surge ./ stormcoins-staging.surge.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
