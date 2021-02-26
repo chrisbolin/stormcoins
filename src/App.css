@@ -44,9 +44,19 @@ pre {
   background-color: lightblue;
 }
 
-.coin {
+@keyframes animate-coin {
+  100% {
+    background-position: -48vw;
+  }
+}
+
+.Coin {
   position: absolute;
-  background-color: yellow;
+  /* coin-sprite is 76 x 76, with 7 frames, so 532px wide */
+  /* the first and the last frames are the same, so it's effectively 6 frames, 432px wide */
+  background-image: url("coin-sprite.png");
+  background-size: cover;
+  animation: animate-coin 1s steps(6) infinite;
 }
 
 .ViewportWarning {
