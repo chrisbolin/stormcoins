@@ -11,7 +11,7 @@ export const SCENE_WIDTH = 100;
 // FURNITURE
 export const PLATFORM_LEFT = 50;
 export const PLATFORM_WIDTH = 30;
-export const COIN_WIDTH = 4;
+export const COIN_WIDTH = 8;
 export const COIN_HEIGHT = 8;
 
 // VEHICLE

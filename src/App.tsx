@@ -120,9 +120,7 @@ function Coin() {
         width: `${COIN_WIDTH}vw`,
         height: `${COIN_HEIGHT}vw`,
       }}
-    >
-      coin
-    </div>
+    />
   );
 }
 

@@ -44,9 +44,24 @@ pre {
   background-color: lightblue;
 }
 
+/* coin-sprite.png is 7 frames of 76x76; the last frame repeats the first,
+   so we step through 6 frames. Sizes are relative so it scales with the coin. */
+@keyframes animate-coin {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
 .coin {
   position: absolute;
-  background-color: yellow;
+  background-image: url("coin-sprite.png");
+  background-size: 700% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: animate-coin 1s steps(6) infinite;
 }
 
 .ViewportWarning {
