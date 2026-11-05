@@ -67,7 +67,6 @@ function Platform() {
         width: `${PLATFORM_WIDTH}vw`,
       }}
     >
-      platform
     </div>
   );
 }
@@ -91,7 +90,6 @@ function Vehicle() {
           height,
         }}
       >
-        helicopter
       </div>
       <div
         className="vehicle"
@@ -102,7 +100,6 @@ function Vehicle() {
           height,
         }}
       >
-        helicopter
       </div>
     </>
   );
@@ -121,7 +118,6 @@ function Coin() {
         height: `${COIN_HEIGHT}vw`,
       }}
     >
-      coin
     </div>
   );
 }
@@ -138,13 +134,13 @@ function Debug() {
 
 function Instructions() {
   return (
-    <h3>
+    <div className="instructions">
       Goal: get coin, land, repeat.
       <br />
       Control: spacebar [computer] or tap [phone]
       <br />
       The wind will push you. Don't land too hard.
-    </h3>
+    </div>
   );
 }
 
@@ -160,15 +156,16 @@ function Dashboard() {
 
   return (
     <>
-      <h3>
-        score: {score}
-        <br />
-        best: {bestScore}; last: {lastScore}
-        <br />
-        speed: {Math.round(velocityX * 1000)}
-        <br />
-        wind speed: {Math.round(windVelocityX * 1000)}
-      </h3>
+      <div className="hud">
+        <div className="hud-score">score: {score}</div>
+        <div>
+          best: {bestScore} · last: {lastScore}
+        </div>
+        <div>
+          speed: {Math.round(velocityX * 1000)} · wind:{" "}
+          {Math.round(windVelocityX * 1000)}
+        </div>
+      </div>
       {paused && <Instructions />}
     </>
   );
