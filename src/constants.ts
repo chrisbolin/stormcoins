@@ -11,12 +11,12 @@ export const SCENE_WIDTH = 100;
 // FURNITURE
 export const PLATFORM_LEFT = 50;
 export const PLATFORM_WIDTH = 30;
-export const COIN_WIDTH = 8;
-export const COIN_HEIGHT = 8;
+export const COIN_WIDTH = 6;
+export const COIN_HEIGHT = 6;
 
 // VEHICLE
-export const VEHICLE_WIDTH = 10;
-// match copter-sprite.png frame aspect ratio (140 x 64); height is visual only
+export const VEHICLE_WIDTH = 12;
+// match copter-sprite.png frame aspect ratio (140 x 64)
 export const VEHICLE_HEIGHT = (VEHICLE_WIDTH * 64) / 140;
 export const VEHICLE_CRASH_VELOCITY = 0.05;
 export const VEHICLE_ZERO_VELOCITY = 1e-4;

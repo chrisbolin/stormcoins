@@ -1,5 +1,13 @@
 import { expect, test } from "vitest";
-import { WIND_VELOCITY_X_INCREMENTAL } from "./constants";
+import {
+  COIN_HEIGHT,
+  COIN_WIDTH,
+  SCENE_HEIGHT,
+  SCENE_WIDTH,
+  VEHICLE_HEIGHT,
+  VEHICLE_WIDTH,
+  WIND_VELOCITY_X_INCREMENTAL,
+} from "./constants";
 import {
   gameReducer,
   initialGameState,
@@ -45,6 +53,37 @@ test("touching the coin scores and hides it", () => {
   expect(next.coinVisible).toBe(false);
 });
 
+test.each([
+  ["below", 0, -VEHICLE_HEIGHT],
+  ["above", 0, COIN_HEIGHT],
+  ["left of", -VEHICLE_WIDTH, 0],
+  ["right of", COIN_WIDTH, 0],
+])("copter just %s the coin does not collect it", (_side, dx, dy) => {
+  const near = 0.01;
+  const next = tick({
+    ...flying,
+    positionX: flying.coinX + dx + Math.sign(dx) * near,
+    positionY: flying.coinY + dy + Math.sign(dy) * near,
+  });
+  expect(next.score).toBe(0);
+  expect(next.coinVisible).toBe(true);
+});
+
+test.each([
+  ["below", 0, -VEHICLE_HEIGHT],
+  ["above", 0, COIN_HEIGHT],
+  ["left of", -VEHICLE_WIDTH, 0],
+  ["right of", COIN_WIDTH, 0],
+])("copter barely overlapping from %s collects the coin", (_side, dx, dy) => {
+  const near = 0.01;
+  const next = tick({
+    ...flying,
+    positionX: flying.coinX + dx - Math.sign(dx) * near,
+    positionY: flying.coinY + dy - Math.sign(dy) * near,
+  });
+  expect(next.score).toBe(100);
+});
+
 test("stopping on the platform after a coin spawns a new one and adds wind", () => {
   const next = tick({
     ...flying,
@@ -57,6 +96,17 @@ test("stopping on the platform after a coin spawns a new one and adds wind", () 
   expect(next.windVelocityX).toBeCloseTo(
     flying.windVelocityX + WIND_VELOCITY_X_INCREMENTAL
   );
+});
+
+test("coins spawn fully on screen and clear of a parked copter", () => {
+  let state: GameState = { ...flying, positionX: 60, positionY: 0 };
+  for (let i = 0; i < 200; i++) {
+    state = tick({ ...state, positionX: 60, positionY: 0, coinVisible: false });
+    expect(state.coinVisible).toBe(true);
+    expect(state.coinY + COIN_HEIGHT).toBeLessThanOrEqual(SCENE_HEIGHT);
+    expect(state.coinX + COIN_WIDTH).toBeLessThanOrEqual(SCENE_WIDTH);
+    expect(state.coinY).toBeGreaterThanOrEqual(VEHICLE_HEIGHT);
+  }
 });
 
 test("landing softly on the platform is safe", () => {

@@ -8,6 +8,7 @@ import {
   PLATFORM_LEFT,
   PLATFORM_WIDTH,
   VEHICLE_WIDTH,
+  VEHICLE_HEIGHT,
   VEHICLE_CRASH_VELOCITY,
   VEHICLE_MAX_ALTITUDE,
   COIN_WIDTH,
@@ -114,7 +115,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         coinVisible = true;
         velocityX = 0;
         coinX = (coinX + SCENE_WIDTH * 0.7) % (SCENE_WIDTH * 0.9);
-        coinY = (coinY + SCENE_HEIGHT * 0.25) % (SCENE_HEIGHT * 0.9);
+        // keep the whole coin on screen, and above a copter parked on the platform
+        coinY =
+          VEHICLE_HEIGHT +
+          (coinY - VEHICLE_HEIGHT + SCENE_HEIGHT * 0.25) %
+            (SCENE_HEIGHT - COIN_HEIGHT - VEHICLE_HEIGHT);
         windVelocityX = windVelocityX + WIND_VELOCITY_X_INCREMENTAL;
       } else if (
         // landing
@@ -158,7 +163,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         state.positionX - state.coinX < COIN_WIDTH &&
         state.coinX - state.positionX < VEHICLE_WIDTH &&
         state.positionY - state.coinY < COIN_HEIGHT &&
-        state.coinY - state.positionY < COIN_WIDTH
+        state.coinY - state.positionY < VEHICLE_HEIGHT
       ) {
         // picked up coin
         coinVisible = false;
