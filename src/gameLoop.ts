@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useReducer, Dispatch } from "react";
+import { useEffect, useReducer } from "react";
+import type { Dispatch } from "react";
 import {
   FORCE_ENGINE,
   FORCE_GRAVITY,
@@ -79,9 +80,9 @@ export const startEngine: GameAction = { type: START_ENGINE };
 export const stopEngine: GameAction = { type: STOP_ENGINE };
 export const restart: GameAction = { type: RESTART };
 
-export function gameReducer(state: GameState, action: GameAction) {
+export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case TICK:
+    case TICK: {
       const { timestamp } = action;
       let {
         coinVisible,
@@ -177,6 +178,7 @@ export function gameReducer(state: GameState, action: GameAction) {
         coinVisible,
         windVelocityX,
       };
+    }
     case START_ENGINE:
       return { ...state, paused: false, engine: true };
     case STOP_ENGINE:
@@ -195,14 +197,14 @@ export function useGameLoop(
     ...initialGameState,
     ...getPersistedGameState(),
   }));
-  const tick = useCallback((newTimestamp) => {
-    dispatch({ type: TICK, timestamp: newTimestamp });
-    window.requestAnimationFrame(tick);
-  }, []);
 
   useEffect(() => {
-    window.requestAnimationFrame(tick);
-  }, [tick]);
+    let frame = window.requestAnimationFrame(function tick(timestamp) {
+      dispatch({ type: TICK, timestamp });
+      frame = window.requestAnimationFrame(tick);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   return [state, dispatch];
 }
