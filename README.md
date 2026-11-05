@@ -1,6 +1,6 @@
 # STORMCOINS
 
-Get coin, land, repeat. Play at https://chris.bolin.co/stormcoins/
+Get coin, land, repeat. Play at https://chrisbolin.co/stormcoins/
 
 ## Development
 
