@@ -1,18 +1,13 @@
-import React, {
-  createContext,
-  memo,
-  useContext,
-  useEffect,
-  Dispatch,
-} from "react";
+import { createContext, memo, useContext, useEffect, useState } from "react";
+import type { Dispatch } from "react";
 import "./App.css";
 import {
   initialGameState,
-  GameAction,
   useGameLoop,
   startEngine,
   stopEngine,
 } from "./gameLoop";
+import type { GameAction } from "./gameLoop";
 import {
   PLATFORM_LEFT,
   PLATFORM_WIDTH,
@@ -24,37 +19,22 @@ import {
   SCENE_WIDTH,
 } from "./constants";
 
-const SPACE_KEY_CODE = 32;
-
-const DispatchContext = createContext((action: GameAction) => {});
+const DispatchContext = createContext<Dispatch<GameAction>>(() => {});
 const StateContext = createContext(initialGameState);
 
-function addListenerToMultipleEvents(
-  types: string[],
-  listener: (arg: any) => any
-) {
-  types.forEach((type) => window.addEventListener(type, listener));
-  return () =>
-    types.forEach((type) => window.removeEventListener(type, listener));
-}
-
 function addGlobalListeners(dispatch: Dispatch<GameAction>) {
-  const removeStartListener = addListenerToMultipleEvents(
-    ["keydown"],
-    (event) => {
-      if (event.keyCode === SPACE_KEY_CODE) dispatch(startEngine);
-    }
-  );
-  const removeStopListeners = addListenerToMultipleEvents(
-    ["keyup"],
-    (event) => {
-      if (event.keyCode === SPACE_KEY_CODE) dispatch(stopEngine);
-    }
-  );
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.code === "Space") dispatch(startEngine);
+  };
+  const onKeyUp = (event: KeyboardEvent) => {
+    if (event.code === "Space") dispatch(stopEngine);
+  };
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 
   return () => {
-    removeStartListener();
-    removeStopListeners();
+    window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("keyup", onKeyUp);
   };
 }
 
@@ -121,7 +101,20 @@ function Coin() {
 
 function Debug() {
   const state = useContext(StateContext);
-  if (window.location.port !== "3000") return null;
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      // ignore key repeat, so holding the key doesn't flicker the panel
+      if (event.key.toLowerCase() === "d" && !event.repeat) {
+        setVisible((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  if (!visible) return null;
   return (
     <pre style={{ margin: 0, position: "absolute", bottom: 0, left: 0 }}>
       {JSON.stringify(state, null, 2)}
@@ -233,13 +226,13 @@ function App() {
   }, [state.lastScore, state.bestScore]);
 
   return (
-    <DispatchContext.Provider value={dispatch}>
-      <StateContext.Provider value={state}>
+    <DispatchContext value={dispatch}>
+      <StateContext value={state}>
         <div className="App">
           <Scene />
         </div>
-      </StateContext.Provider>
-    </DispatchContext.Provider>
+      </StateContext>
+    </DispatchContext>
   );
 }
 
