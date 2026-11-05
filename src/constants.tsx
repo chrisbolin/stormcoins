@@ -16,7 +16,8 @@ export const COIN_HEIGHT = 8;
 
 // VEHICLE
 export const VEHICLE_WIDTH = 10;
-export const VEHICLE_HEIGHT = 6;
+// match copter-sprite.png frame aspect ratio (140 x 64); height is visual only
+export const VEHICLE_HEIGHT = (VEHICLE_WIDTH * 64) / 140;
 export const VEHICLE_CRASH_VELOCITY = 0.05;
 export const VEHICLE_ZERO_VELOCITY = 1e-4;
 export const VEHICLE_MAX_ALTITUDE = 1000;

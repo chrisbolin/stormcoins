@@ -90,9 +90,7 @@ function Vehicle() {
           width,
           height,
         }}
-      >
-        helicopter
-      </div>
+      />
       <div
         className="vehicle"
         style={{
@@ -101,9 +99,7 @@ function Vehicle() {
           width,
           height,
         }}
-      >
-        helicopter
-      </div>
+      />
     </>
   );
 }

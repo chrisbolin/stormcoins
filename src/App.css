@@ -39,9 +39,24 @@ pre {
   background-color: grey;
 }
 
+/* copter-sprite.png is 4 frames of 140x64 (rotor spinning) */
+@keyframes animate-copter {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    /* 4 frames: 400% sheet, so -4 frame widths = 133.33% */
+    background-position: 133.333% 0;
+  }
+}
+
 .vehicle {
   position: absolute;
-  background-color: lightblue;
+  background-image: url("copter-sprite.png");
+  background-size: 400% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: animate-copter 0.2s steps(4) infinite;
 }
 
 /* coin-sprite.png is 7 frames of 76x76; the last frame repeats the first,
