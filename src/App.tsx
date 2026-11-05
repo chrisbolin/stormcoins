@@ -89,8 +89,7 @@ function Vehicle() {
           width,
           height,
         }}
-      >
-      </div>
+      />
       <div
         className="vehicle"
         style={{
@@ -99,8 +98,7 @@ function Vehicle() {
           width,
           height,
         }}
-      >
-      </div>
+      />
     </>
   );
 }
@@ -117,8 +115,7 @@ function Coin() {
         width: `${COIN_WIDTH}vw`,
         height: `${COIN_HEIGHT}vw`,
       }}
-    >
-    </div>
+    />
   );
 }
 
