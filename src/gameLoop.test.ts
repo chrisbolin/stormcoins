@@ -109,6 +109,25 @@ test("coins spawn fully on screen and clear of a parked copter", () => {
   }
 });
 
+test("coin and wind for a given level don't depend on how it was reached", () => {
+  // land after each coin with different timing, position and leftover drift
+  const playTo = (level: number, dt: number, positionX: number) => {
+    let state = initialGameState;
+    for (let i = 1; i < level; i++) {
+      const landed = { ...state, paused: false, positionX, positionY: 0 };
+      state = tick({ ...landed, coinVisible: false }, dt + i);
+    }
+    return state;
+  };
+  const a = playTo(29, 16, 50);
+  const b = playTo(29, 7, 68);
+  expect([a.coinX, a.coinY, a.windVelocityX]).toEqual([
+    b.coinX,
+    b.coinY,
+    b.windVelocityX,
+  ]);
+});
+
 test("landing softly on the platform is safe", () => {
   const next = tick({ ...flying, positionX: 60, positionY: -0.1, velocityY: -0.01 });
   expect(next.paused).toBe(false);
