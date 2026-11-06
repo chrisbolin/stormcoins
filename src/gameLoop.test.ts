@@ -112,6 +112,20 @@ test.each([
   expect(next.score).toBe(100);
 });
 
+test("the copter's wrapped copy collects a coin on the far left", () => {
+  const coin = { ...flying, coinX: 3, positionY: flying.coinY };
+  // the nose has wrapped onto the left edge and reached the coin
+  const touching = SCENE_WIDTH - VEHICLE_WIDTH + coin.coinX + 0.01;
+  expect(tick({ ...coin, positionX: touching }).score).toBe(100);
+  // the nose is still just short of the coin
+  const short = SCENE_WIDTH - VEHICLE_WIDTH + coin.coinX - 0.01;
+  expect(tick({ ...coin, positionX: short }).score).toBe(0);
+  // out of reach vertically, wrapped or not
+  expect(
+    tick({ ...coin, positionX: touching, positionY: coin.coinY + COIN_HEIGHT + 1 }).score
+  ).toBe(0);
+});
+
 test("stopping on the platform after a coin spawns a new one and adds wind", () => {
   const next = tick({
     ...flying,

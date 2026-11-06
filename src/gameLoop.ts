@@ -229,10 +229,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         positionY = state.positionY + dt * state.velocityY;
       }
 
+      // the copter is drawn twice as it wraps around the screen; either copy can
+      // reach the coin
+      const touchesCoinX = (x: number) =>
+        x - state.coinX < COIN_WIDTH && state.coinX - x < VEHICLE_WIDTH;
+
       if (
         coinVisible &&
-        state.positionX - state.coinX < COIN_WIDTH &&
-        state.coinX - state.positionX < VEHICLE_WIDTH &&
+        (touchesCoinX(state.positionX) ||
+          touchesCoinX(state.positionX - SCENE_WIDTH)) &&
         state.positionY - state.coinY < COIN_HEIGHT &&
         state.coinY - state.positionY < VEHICLE_HEIGHT
       ) {
