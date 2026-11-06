@@ -14,6 +14,7 @@ import {
 import {
   gameReducer,
   initialGameState,
+  isReset,
   nextLevel,
   startEngine,
   stopEngine,
@@ -225,4 +226,19 @@ test("skipping a level matches landing with the coin", () => {
   for (const key of ["level", "coinX", "coinY", "windVelocityX", "coinVisible"] as const) {
     expect(skipped[key]).toEqual(earned[key]);
   }
+});
+
+test("a crash finishing, or flying away past level 1, counts as a reset", () => {
+  const crashing = tick({ ...flying, positionY: -1, level: 3 });
+  const done = tick(crashing, CRASH_DURATION);
+  expect(isReset(crashing, done)).toBe(true);
+  // a crash at level 1 still resets
+  const crashing1 = tick({ ...flying, positionY: -1 });
+  expect(isReset(crashing1, tick(crashing1, CRASH_DURATION))).toBe(true);
+  // flying away from level 4
+  const away = { ...flying, positionY: 2000, level: 4 };
+  expect(isReset(away, tick(away))).toBe(true);
+  // next level, or just flying, is not a reset
+  expect(isReset(flying, gameReducer(flying, nextLevel))).toBe(false);
+  expect(isReset(flying, tick(flying))).toBe(false);
 });

@@ -104,6 +104,17 @@ export const restart: GameAction = { type: RESTART };
 // skips straight to the next level; only previews use it
 export const nextLevel: GameAction = { type: NEXT_LEVEL };
 
+// true when the game went back to the start: a crash animation finished, or the
+// copter flew away from a level past the first
+export function isReset(
+  before: Pick<GameState, "crashedAt" | "level">,
+  after: Pick<GameState, "crashedAt" | "level">
+): boolean {
+  const crashEnded = before.crashedAt !== null && after.crashedAt === null;
+  const backToStart = before.level > 1 && after.level === 1;
+  return crashEnded || backToStart;
+}
+
 // a new coin, more wind, and the next level
 function advanceLevel(state: GameState): Partial<GameState> {
   return {

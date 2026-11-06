@@ -11,6 +11,7 @@ import "./App.css";
 import {
   initialGameState,
   isOverPlatform,
+  isReset,
   useGameLoop,
   nextLevel,
   startEngine,
@@ -305,6 +306,19 @@ function Strike({
   );
 }
 
+// Going back to level 1, after a crash or flying away, flashes too, so the sky
+// and rain jump back to their first look under cover of the flash.
+function ResetFlash() {
+  const { crashedAt, level } = useContext(StateContext);
+  const [previous, setPrevious] = useState({ crashedAt, level });
+  const [resets, setResets] = useState(0);
+  if (previous.crashedAt !== crashedAt || previous.level !== level) {
+    setPrevious({ crashedAt, level });
+    if (isReset(previous, { crashedAt, level })) setResets(resets + 1);
+  }
+  return resets > 0 ? <div key={resets} className="flash" /> : null;
+}
+
 // preview builds (VITE_PREVIEW=1) get a button to skip to the next level
 const PREVIEW = import.meta.env.VITE_PREVIEW === "1";
 
@@ -344,6 +358,7 @@ const Scene = memo(function () {
         <Crash />
         <Rain front={true} />
         <Lightning />
+        <ResetFlash />
       </Sky>
       <Debug />
       <GamePad />
