@@ -204,8 +204,6 @@ function Instructions() {
       <br />
       Land slowly.
       <br />
-      Repeat.
-      <br />
       Tap or spacebar.
     </div>
   );
