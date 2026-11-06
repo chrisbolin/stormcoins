@@ -113,7 +113,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         windVelocityX,
         level,
       } = state;
-      let { engine } = state;
       const dt = timestamp - state.timestamp;
 
       // crash animation is playing; the scores were recorded when it started
@@ -182,13 +181,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           timestamp,
         };
       } else {
-        // flying. Past the top of the screen the engine cuts out, and stays off
-        // until the player presses again
-        if (state.positionY > VEHICLE_CEILING) engine = false;
+        // flying. Past the top of the screen the engine gives no thrust; it comes
+        // back once the copter is in frame, if the player is still pressing
+        const thrust = state.engine && state.positionY <= VEHICLE_CEILING;
         const relativeWindVelocityX = windVelocityX - velocityX;
         velocityY =
           state.velocityY +
-          (FORCE_ENGINE * Number(engine) - FORCE_GRAVITY) * dt;
+          (FORCE_ENGINE * Number(thrust) - FORCE_GRAVITY) * dt;
         const drag =
           Math.pow(relativeWindVelocityX, 2) *
           Math.sign(relativeWindVelocityX) *
@@ -218,7 +217,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       return {
         ...state,
-        engine,
         timestamp,
         positionX,
         positionY,
