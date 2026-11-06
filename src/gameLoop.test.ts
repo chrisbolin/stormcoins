@@ -14,6 +14,7 @@ import {
 import {
   gameReducer,
   initialGameState,
+  nextLevel,
   startEngine,
   stopEngine,
 } from "./gameLoop";
@@ -215,4 +216,13 @@ test("the engine gives no thrust above the top of the screen, and resumes back i
   expect(high.engine).toBe(true); // still pressing
   const back = tick({ ...high, positionY: VEHICLE_CEILING - 1, velocityY: 0 });
   expect(back.velocityY).toBeGreaterThan(0);
+});
+
+test("skipping a level matches landing with the coin", () => {
+  const landed = { ...flying, positionX: 60, positionY: 0, coinVisible: false };
+  const skipped = gameReducer(landed, nextLevel);
+  const earned = tick(landed);
+  for (const key of ["level", "coinX", "coinY", "windVelocityX", "coinVisible"] as const) {
+    expect(skipped[key]).toEqual(earned[key]);
+  }
 });

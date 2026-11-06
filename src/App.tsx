@@ -12,10 +12,12 @@ import {
   initialGameState,
   isOverPlatform,
   useGameLoop,
+  nextLevel,
   startEngine,
   stopEngine,
 } from "./gameLoop";
 import type { GameAction } from "./gameLoop";
+import { boltCells, coinTarget, drawBolt } from "./lightning";
 import { skyColor } from "./skyColor";
 import { useTextLayout } from "./textLayout";
 import type { TextLayout } from "./textLayout";
@@ -264,6 +266,64 @@ function GamePad() {
   );
 }
 
+// Each new level arrives with a strike on the new coin. Keyed by level, so the
+// animation plays once per level; level 1 (a fresh game) has none.
+function Lightning() {
+  const { level, coinX, coinY } = useContext(StateContext);
+  if (level === 1) return null;
+  return <Strike key={level} level={level} coinX={coinX} coinY={coinY} />;
+}
+
+function Strike({
+  level,
+  coinX,
+  coinY,
+}: {
+  level: number;
+  coinX: number;
+  coinY: number;
+}) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const context = canvas.current?.getContext("2d");
+    if (context) drawBolt(context, boltCells(level, coinTarget(coinX, coinY)));
+  }, [level, coinX, coinY]);
+  return (
+    <>
+      <div className="flash" />
+      <canvas
+        ref={canvas}
+        className="rain bolt"
+        width={RAIN_CANVAS_WIDTH}
+        height={RAIN_CANVAS_HEIGHT}
+        style={{
+          width: units(RAIN_CANVAS_WIDTH * ART_PIXEL),
+          height: units(RAIN_CANVAS_HEIGHT * ART_PIXEL),
+        }}
+      />
+    </>
+  );
+}
+
+// preview builds (VITE_PREVIEW=1) get a button to skip to the next level
+const PREVIEW = import.meta.env.VITE_PREVIEW === "1";
+
+function PreviewControls() {
+  const dispatch = useContext(DispatchContext);
+  const { level } = useContext(StateContext);
+  return (
+    <button
+      type="button"
+      className="preview-next"
+      tabIndex={-1}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={() => dispatch(nextLevel)}
+    >
+      level {level} → {level + 1}
+    </button>
+  );
+}
+
 function Sky({ children }: { children: ReactNode }) {
   const { level } = useContext(StateContext);
   return (
@@ -283,6 +343,7 @@ const Scene = memo(function () {
         <Vehicle />
         <Crash />
         <Rain front={true} />
+        <Lightning />
       </Sky>
       <Debug />
       <GamePad />
@@ -322,6 +383,7 @@ function App() {
         <div className="App" data-layout={layout}>
           <Scene />
           <Dashboard layout={layout} />
+          {PREVIEW && <PreviewControls />}
         </div>
       </StateContext>
     </DispatchContext>

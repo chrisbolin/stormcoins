@@ -81,9 +81,14 @@ const TICK = "tick";
 const START_ENGINE = "start_engine";
 const STOP_ENGINE = "stop_engine";
 const RESTART = "restart";
+const NEXT_LEVEL = "next_level";
 
 interface BasicAction {
-  type: typeof START_ENGINE | typeof STOP_ENGINE | typeof RESTART;
+  type:
+    | typeof START_ENGINE
+    | typeof STOP_ENGINE
+    | typeof RESTART
+    | typeof NEXT_LEVEL;
 }
 
 interface TickAction {
@@ -96,6 +101,24 @@ export type GameAction = TickAction | BasicAction;
 export const startEngine: GameAction = { type: START_ENGINE };
 export const stopEngine: GameAction = { type: STOP_ENGINE };
 export const restart: GameAction = { type: RESTART };
+// skips straight to the next level; only previews use it
+export const nextLevel: GameAction = { type: NEXT_LEVEL };
+
+// a new coin, more wind, and the next level
+function advanceLevel(state: GameState): Partial<GameState> {
+  return {
+    coinVisible: true,
+    velocityX: 0,
+    coinX: (state.coinX + SCENE_WIDTH * 0.7) % (SCENE_WIDTH * 0.9),
+    // keep the whole coin on screen, and above a copter parked on the platform
+    coinY:
+      VEHICLE_HEIGHT +
+      ((state.coinY - VEHICLE_HEIGHT + SCENE_HEIGHT * 0.25) %
+        (SCENE_HEIGHT - DECK_LIFT - COIN_HEIGHT - VEHICLE_HEIGHT)),
+    windVelocityX: state.windVelocityX + WIND_VELOCITY_X_INCREMENTAL,
+    level: state.level + 1,
+  };
+}
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -141,16 +164,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         state.positionY === 0 &&
         Math.abs(state.velocityX) < VEHICLE_ZERO_VELOCITY
       ) {
-        coinVisible = true;
-        velocityX = 0;
-        coinX = (coinX + SCENE_WIDTH * 0.7) % (SCENE_WIDTH * 0.9);
-        // keep the whole coin on screen, and above a copter parked on the platform
-        coinY =
-          VEHICLE_HEIGHT +
-          (coinY - VEHICLE_HEIGHT + SCENE_HEIGHT * 0.25) %
-            (SCENE_HEIGHT - DECK_LIFT - COIN_HEIGHT - VEHICLE_HEIGHT);
-        windVelocityX = windVelocityX + WIND_VELOCITY_X_INCREMENTAL;
-        level = level + 1;
+        ({ coinVisible, velocityX, coinX, coinY, windVelocityX, level } =
+          advanceLevel(state) as GameState);
       } else if (
         // landing
         !state.engine &&
@@ -235,6 +250,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, paused: false, engine: true };
     case STOP_ENGINE:
       return { ...state, engine: false };
+    case NEXT_LEVEL:
+      return { ...state, ...advanceLevel(state) };
     case RESTART:
       return { ...initialGameState, timestamp: state.timestamp };
     default:

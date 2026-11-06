@@ -59,7 +59,7 @@ export function rainForLevel(level: number): RainLevel {
 }
 
 // mulberry32. Seeded so the layout is the same on every load and render.
-function seededRandom(seed: number): () => number {
+export function seededRandom(seed: number): () => number {
   let a = seed;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
