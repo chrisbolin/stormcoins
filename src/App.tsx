@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { Dispatch } from "react";
+import type { Dispatch, ReactNode } from "react";
 import "./App.css";
 import {
   initialGameState,
@@ -16,6 +16,7 @@ import {
   stopEngine,
 } from "./gameLoop";
 import type { GameAction } from "./gameLoop";
+import { skyColor } from "./skyColor";
 import { useTextLayout } from "./textLayout";
 import type { TextLayout } from "./textLayout";
 import {
@@ -199,18 +200,17 @@ function Debug() {
 function Instructions() {
   return (
     <div className="instructions">
-      Goal: get coin, land, repeat.
+      Get coin.
       <br />
-      Control: tap, click or spacebar
+      Land slowly.
       <br />
-      The wind will push you. Don't land too hard.
+      Tap or spacebar.
     </div>
   );
 }
 
 function Dashboard({ layout }: { layout: TextLayout }) {
   const {
-    paused,
     score,
     bestScore,
     lastScore,
@@ -242,7 +242,7 @@ function Dashboard({ layout }: { layout: TextLayout }) {
           </>
         )}
       </div>
-      {paused && <Instructions />}
+      <Instructions />
     </>
   );
 }
@@ -264,17 +264,26 @@ function GamePad() {
   );
 }
 
+function Sky({ children }: { children: ReactNode }) {
+  const { level } = useContext(StateContext);
+  return (
+    <div className="sky" style={{ backgroundColor: skyColor(level) }}>
+      {children}
+    </div>
+  );
+}
+
 const Scene = memo(function () {
   return (
     <div className="scene">
-      <div className="sky">
+      <Sky>
         <Rain front={false} />
         <Platform />
         <Coin />
         <Vehicle />
         <Crash />
         <Rain front={true} />
-      </div>
+      </Sky>
       <Debug />
       <GamePad />
     </div>

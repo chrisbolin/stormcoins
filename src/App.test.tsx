@@ -9,25 +9,38 @@ beforeAll(() => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 });
 
-test("shows instructions until the spacebar starts the game", () => {
+// the debug panel shows the game state
+function isPaused(container: HTMLElement): boolean {
+  if (!container.querySelector("pre")) fireEvent.keyDown(window, { key: "d" });
+  return JSON.parse(container.querySelector("pre")!.textContent!).paused;
+}
+
+test("spacebar starts the game, and instructions stay on screen", () => {
   const { container } = render(<App />);
   expect(container.querySelector(".instructions")).not.toBeNull();
+  expect(isPaused(container)).toBe(true);
 
   fireEvent.keyDown(window, { code: "Space" });
-  expect(container.querySelector(".instructions")).toBeNull();
+  expect(isPaused(container)).toBe(false);
+  expect(container.querySelector(".instructions")).not.toBeNull();
+});
+
+test("sky starts at level 1's color", () => {
+  const { container } = render(<App />);
+  const sky = container.querySelector<HTMLElement>(".sky")!;
+  expect(sky.style.backgroundColor).toBe("rgb(80, 151, 219)");
 });
 
 test("holding the mouse or a finger runs the engine; other buttons don't", () => {
   HTMLElement.prototype.setPointerCapture = vi.fn();
   const { container } = render(<App />);
   const pad = container.querySelector(".GamePad")!;
-  const instructions = () => container.querySelector(".instructions");
 
   fireEvent.pointerDown(pad, { button: 2, pointerId: 1 });
-  expect(instructions()).not.toBeNull();
+  expect(isPaused(container)).toBe(true);
 
   fireEvent.pointerDown(pad, { button: 0, pointerId: 1 });
-  expect(instructions()).toBeNull();
+  expect(isPaused(container)).toBe(false);
   expect(HTMLElement.prototype.setPointerCapture).toHaveBeenCalled();
   fireEvent.pointerUp(pad, { button: 0, pointerId: 1 });
 });
