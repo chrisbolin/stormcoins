@@ -32,7 +32,6 @@
 .sky {
   position: absolute;
   inset: 0 0 var(--unit) 0;
-  background-color: #3b82c4;
 }
 
 /* Clicking or tapping anywhere works, including the black area outside the square */
@@ -67,8 +66,8 @@
 /* Side bars: stats on the left, instructions on the right, both against the square */
 .App[data-layout="side"] {
   --bar: calc((100vw - var(--unit) * 100) / 2);
-  /* wide enough for "score: 12000", and short enough for the instructions */
-  --text-size: clamp(14px, min(calc((var(--bar) - 24px) / 8.2), calc(var(--unit) * 5.6)), 32px);
+  /* keeps "Tap or spacebar." on one line, and the text short enough to fit the height */
+  --text-size: clamp(14px, min(calc((var(--bar) - 24px) / 11.2), calc(var(--unit) * 5.6)), 32px);
 }
 
 .App[data-layout="side"] .hud {
@@ -87,10 +86,8 @@
 /* Top and bottom bars: stats on top of the square, instructions below it */
 .App[data-layout="stack"] {
   --bar: calc((var(--screen-height) - var(--unit) * 100) / 2);
-  /* the larger of two safe sizes: instructions wrapped to 5 lines, or fitting on 3 */
-  --five-lines: min(calc(100vw / 22), calc((var(--bar) - 12px) / 6.5));
-  --three-lines: min(calc((100vw - 24px) / 29.2), calc((var(--bar) - 12px) / 4.6));
-  --text-size: clamp(13px, max(var(--five-lines), var(--three-lines)), 32px);
+  /* keeps the stats on one line each, and the instructions inside the bottom bar */
+  --text-size: clamp(13px, min(calc(100vw / 22), calc((var(--bar) - 12px) / 6.5)), 32px);
 }
 
 .App[data-layout="stack"] .hud {
