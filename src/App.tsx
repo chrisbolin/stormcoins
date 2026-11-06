@@ -8,6 +8,8 @@ import {
   stopEngine,
 } from "./gameLoop";
 import type { GameAction } from "./gameLoop";
+import { useTextLayout } from "./textLayout";
+import type { TextLayout } from "./textLayout";
 import {
   PLATFORM_LEFT,
   PLATFORM_WIDTH,
@@ -15,9 +17,10 @@ import {
   VEHICLE_HEIGHT,
   COIN_HEIGHT,
   COIN_WIDTH,
-  SCENE_HEIGHT,
-  SCENE_WIDTH,
 } from "./constants";
+
+// game units to CSS: the square screen is 100 units on each side
+const units = (n: number) => `calc(var(--unit) * ${n})`;
 
 const DispatchContext = createContext<Dispatch<GameAction>>(() => {});
 const StateContext = createContext(initialGameState);
@@ -43,41 +46,28 @@ function Platform() {
     <div
       className="platform"
       style={{
-        left: `${PLATFORM_LEFT}vw`,
-        width: `${PLATFORM_WIDTH}vw`,
+        left: units(PLATFORM_LEFT),
+        width: units(PLATFORM_WIDTH),
       }}
-    >
-    </div>
+    />
   );
 }
 
 function Vehicle() {
   const { positionX, positionY } = useContext(StateContext);
-  // render two copters, so that when the play "wraps around" the screen it's fluid
-  const leftA = `${positionX}vw`;
-  const leftB = `${positionX - 100}vw`;
-  const bottom = `${positionY}vw`;
-  const width = `${VEHICLE_WIDTH}vw`;
-  const height = `${VEHICLE_HEIGHT}vw`;
+  // render two copters, so that when the player "wraps around" the screen it's fluid
+  const bottom = units(positionY);
+  const width = units(VEHICLE_WIDTH);
+  const height = units(VEHICLE_HEIGHT);
   return (
     <>
       <div
         className="vehicle"
-        style={{
-          left: leftA,
-          bottom,
-          width,
-          height,
-        }}
+        style={{ left: units(positionX), bottom, width, height }}
       />
       <div
         className="vehicle"
-        style={{
-          left: leftB,
-          bottom,
-          width,
-          height,
-        }}
+        style={{ left: units(positionX - 100), bottom, width, height }}
       />
     </>
   );
@@ -90,10 +80,10 @@ function Coin() {
     <div
       className="coin"
       style={{
-        left: `${coinX}vw`,
-        bottom: `${coinY}vw`,
-        width: `${COIN_WIDTH}vw`,
-        height: `${COIN_HEIGHT}vw`,
+        left: units(coinX),
+        bottom: units(coinY),
+        width: units(COIN_WIDTH),
+        height: units(COIN_HEIGHT),
       }}
     />
   );
@@ -127,14 +117,14 @@ function Instructions() {
     <div className="instructions">
       Goal: get coin, land, repeat.
       <br />
-      Control: spacebar [computer] or tap [phone]
+      Control: tap, click or spacebar
       <br />
       The wind will push you. Don't land too hard.
     </div>
   );
 }
 
-function Dashboard() {
+function Dashboard({ layout }: { layout: TextLayout }) {
   const {
     paused,
     score,
@@ -143,29 +133,33 @@ function Dashboard() {
     windVelocityX,
     velocityX,
   } = useContext(StateContext);
+  const speed = Math.round(velocityX * 1000);
+  const wind = Math.round(windVelocityX * 1000);
 
   return (
     <>
       <div className="hud">
         <div className="hud-score">score: {score}</div>
-        <div>
-          best: {bestScore} · last: {lastScore}
-        </div>
-        <div>
-          speed: {Math.round(velocityX * 1000)} · wind:{" "}
-          {Math.round(windVelocityX * 1000)}
-        </div>
+        {layout === "side" ? (
+          <>
+            <div>best: {bestScore}</div>
+            <div>last: {lastScore}</div>
+            <div>speed: {speed}</div>
+            <div>wind: {wind}</div>
+          </>
+        ) : (
+          <>
+            <div>
+              best: {bestScore} · last: {lastScore}
+            </div>
+            <div>
+              speed: {speed} · wind: {wind}
+            </div>
+          </>
+        )}
       </div>
       {paused && <Instructions />}
     </>
-  );
-}
-
-function ViewportWarning() {
-  return (
-    <div className="ViewportWarning">
-      <h3>Can you make your browser taller? You can't see all of the game.</h3>
-    </div>
   );
 }
 
@@ -174,27 +168,27 @@ function GamePad() {
   return (
     <div
       className="GamePad"
-      onTouchStart={() => dispatch(startEngine)}
-      onTouchEnd={() => dispatch(stopEngine)}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return; // ignore right and middle clicks
+        // keep receiving events if the mouse is released outside the window
+        event.currentTarget.setPointerCapture(event.pointerId);
+        dispatch(startEngine);
+      }}
+      onPointerUp={() => dispatch(stopEngine)}
+      onPointerCancel={() => dispatch(stopEngine)}
     />
   );
 }
 
 const Scene = memo(function () {
   return (
-    <div
-      className="scene"
-      style={{
-        height: `${SCENE_HEIGHT}vw`,
-        width: `${SCENE_WIDTH}vw`,
-      }}
-    >
-      <Dashboard />
+    <div className="scene">
+      <div className="sky">
+        <Platform />
+        <Coin />
+        <Vehicle />
+      </div>
       <Debug />
-      <Platform />
-      <Coin />
-      <Vehicle />
-      <ViewportWarning />
       <GamePad />
     </div>
   );
@@ -209,6 +203,7 @@ function setLocalStorageNumber(key: string, x: number): void {
 }
 
 function App() {
+  const layout = useTextLayout();
   const [state, dispatch] = useGameLoop(() => {
     const bestScore = getLocalStorageNumber("bestScore");
     const lastScore = getLocalStorageNumber("lastScore");
@@ -228,8 +223,9 @@ function App() {
   return (
     <DispatchContext value={dispatch}>
       <StateContext value={state}>
-        <div className="App">
+        <div className="App" data-layout={layout}>
           <Scene />
+          <Dashboard layout={layout} />
         </div>
       </StateContext>
     </DispatchContext>

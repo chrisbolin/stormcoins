@@ -1,74 +1,140 @@
-pre,
-h3 {
-  margin: 0;
-  color: white;
+/* The game is a square, as large as fits on screen. --unit is 1/100 of its side. */
+:root {
+  --screen-height: 100vh;
+  --unit: calc(min(100vw, var(--screen-height)) / 100);
 }
 
-h3 {
-  font-size: clamp(14px, 2.4vw, 28px);
-}
-
-/* HUD + instructions: scale with the scene, but stay legible on phones and
-   don't swamp the play area on large screens */
-.hud,
-.instructions {
-  position: absolute;
-  color: white;
-  font-weight: bold;
-  line-height: 1.3;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.hud {
-  top: 0.6em;
-  left: 0.8em;
-  font-size: clamp(12px, 1.6vw, 22px);
-}
-
-.hud-score {
-  font-size: 1.5em;
-}
-
-.instructions {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: max-content;
-  max-width: 90%;
-  text-align: center;
-  font-size: clamp(13px, 2vw, 26px);
-}
-pre {
-  font-size: 1vw;
+@supports (height: 100dvh) {
+  :root {
+    --screen-height: 100dvh;
+  }
 }
 
 .App {
-  position: absolute;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-}
-
-.GamePad {
-  top: 0;
-  left: 0;
   position: fixed;
-  height: 100vh;
-  width: 100vw;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background-color: black;
+  user-select: none;
 }
 
 .scene {
   position: relative;
+  width: calc(var(--unit) * 100);
+  height: calc(var(--unit) * 100);
+  overflow: hidden;
+  background-color: black;
+}
+
+/* Game positions are measured from the top of the ground, 1 unit up from the bottom */
+.sky {
+  position: absolute;
+  inset: 0 0 var(--unit) 0;
   background-color: #3b82c4;
-  user-select: none;
+}
+
+/* Clicking or tapping anywhere works, including the black area outside the square */
+.GamePad {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+}
+
+/* All text is one size. Where it goes depends on the black bars: see textLayout.ts */
+.hud,
+.instructions {
+  position: absolute;
+  color: white;
+  font-size: var(--text-size);
+  line-height: 1.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.instructions {
+  text-align: left;
+}
+
+/* Silkscreen's strokes are 1/8 em, so this line matches the letters */
+.hud-score {
+  border-bottom: 0.125em solid currentColor;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Side bars: stats on the left, instructions on the right, both against the square */
+.App[data-layout="side"] {
+  --bar: calc((100vw - var(--unit) * 100) / 2);
+  /* wide enough for "score: 12000", and short enough for the instructions */
+  --text-size: clamp(14px, min(calc((var(--bar) - 24px) / 8.2), calc(var(--unit) * 5.6)), 32px);
+}
+
+.App[data-layout="side"] .hud {
+  top: 12px;
+  right: calc(50% + var(--unit) * 50 + 12px);
+  text-align: right;
+}
+
+.App[data-layout="side"] .instructions {
+  top: 50%;
+  left: calc(50% + var(--unit) * 50 + 12px);
+  width: calc(var(--bar) - 24px);
+  transform: translateY(-50%);
+}
+
+/* Top and bottom bars: stats on top of the square, instructions below it */
+.App[data-layout="stack"] {
+  --bar: calc((var(--screen-height) - var(--unit) * 100) / 2);
+  /* the larger of two safe sizes: instructions wrapped to 5 lines, or fitting on 3 */
+  --five-lines: min(calc(100vw / 22), calc((var(--bar) - 12px) / 6.5));
+  --three-lines: min(calc((100vw - 24px) / 29.2), calc((var(--bar) - 12px) / 4.6));
+  --text-size: clamp(13px, max(var(--five-lines), var(--three-lines)), 32px);
+}
+
+.App[data-layout="stack"] .hud {
+  left: 12px;
+  bottom: calc(50% + var(--unit) * 50 + 12px);
+}
+
+.App[data-layout="stack"] .instructions {
+  top: calc(50% + var(--unit) * 50 + 12px);
+  left: 12px;
+  right: 12px;
+}
+
+/* No usable bars: text goes over the sky, and coins can pass under the stats */
+.App[data-layout="inside"] {
+  --text-size: clamp(13px, calc(var(--unit) * 3), 32px);
+}
+
+.App[data-layout="inside"] :is(.hud, .instructions) {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.App[data-layout="inside"] .hud {
+  top: calc(50% - var(--unit) * 50 + 0.6em);
+  left: calc(50% - var(--unit) * 50 + 0.8em);
+}
+
+.App[data-layout="inside"] .instructions {
+  top: 50%;
+  left: calc(50% - var(--unit) * 45);
+  width: calc(var(--unit) * 90);
+  transform: translateY(-50%);
+}
+
+pre {
+  margin: 0;
+  color: white;
+  font-size: clamp(9px, calc(var(--unit) * 1.5), 16px);
 }
 
 .platform {
   position: absolute;
-  height: 2vw;
-  bottom: -1vw;
+  height: calc(var(--unit) * 2);
+  bottom: calc(var(--unit) * -1);
   background-color: grey;
 }
 
@@ -110,28 +176,4 @@ pre {
   background-repeat: no-repeat;
   image-rendering: pixelated;
   animation: animate-coin 1s steps(6) infinite;
-}
-
-.ViewportWarning {
-  position: fixed;
-  bottom: 0;
-  background-color: darkred;
-  color: white;
-  padding: 2em;
-  width: 100vw;
-}
-
-@media (min-height: 42vw) {
-  .ViewportWarning {
-    display: none;
-  }
-}
-
-/* portrait: the scene is a short strip, so put instructions in the empty
-   space below it instead of on top of the HUD */
-@media (orientation: portrait) {
-  .instructions {
-    top: calc(100% + 1.5em);
-    transform: translateX(-50%);
-  }
 }

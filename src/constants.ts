@@ -5,17 +5,19 @@ export const COEFFICIENT_DRAG = 0.01;
 export const COEFFICIENT_FRICTION = 0.1;
 
 // SCENE
-export const SCENE_HEIGHT = 42;
+// The screen is a 100 x 100 square. The bottom 1 is ground below the platform,
+// which leaves 99 of sky above it.
+export const SCENE_HEIGHT = 99;
 export const SCENE_WIDTH = 100;
 
 // FURNITURE
 export const PLATFORM_LEFT = 50;
 export const PLATFORM_WIDTH = 30;
-export const COIN_WIDTH = 6;
-export const COIN_HEIGHT = 6;
+export const COIN_WIDTH = 7.2;
+export const COIN_HEIGHT = 7.2;
 
 // VEHICLE
-export const VEHICLE_WIDTH = 12;
+export const VEHICLE_WIDTH = 14.4;
 // match copter-sprite.png frame aspect ratio (140 x 64)
 export const VEHICLE_HEIGHT = (VEHICLE_WIDTH * 64) / 140;
 export const VEHICLE_CRASH_VELOCITY = 0.05;
