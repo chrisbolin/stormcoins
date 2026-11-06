@@ -11,6 +11,7 @@ import {
   VEHICLE_HEIGHT,
   VEHICLE_CRASH_VELOCITY,
   VEHICLE_MAX_ALTITUDE,
+  VEHICLE_CEILING,
   COIN_WIDTH,
   COIN_HEIGHT,
   VEHICLE_ZERO_VELOCITY,
@@ -180,11 +181,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           timestamp,
         };
       } else {
-        // flying
+        // flying. Past the top of the screen the engine gives no thrust; it comes
+        // back once the copter is in frame, if the player is still pressing
+        const thrust = state.engine && state.positionY <= VEHICLE_CEILING;
         const relativeWindVelocityX = windVelocityX - velocityX;
         velocityY =
           state.velocityY +
-          (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
+          (FORCE_ENGINE * Number(thrust) - FORCE_GRAVITY) * dt;
         const drag =
           Math.pow(relativeWindVelocityX, 2) *
           Math.sign(relativeWindVelocityX) *

@@ -6,6 +6,7 @@ import {
   DECK_LIFT,
   SCENE_HEIGHT,
   SCENE_WIDTH,
+  VEHICLE_CEILING,
   VEHICLE_HEIGHT,
   VEHICLE_WIDTH,
   WIND_VELOCITY_X_INCREMENTAL,
@@ -206,4 +207,12 @@ test("flying away resets without a crash animation", () => {
   expect(next.crashedAt).toBeNull();
   expect(next.paused).toBe(true);
   expect(next.lastScore).toBe(100);
+});
+
+test("the engine gives no thrust above the top of the screen, and resumes back in frame", () => {
+  const high = tick({ ...flying, engine: true, positionY: VEHICLE_CEILING + 1 });
+  expect(high.velocityY).toBeLessThan(0);
+  expect(high.engine).toBe(true); // still pressing
+  const back = tick({ ...high, positionY: VEHICLE_CEILING - 1, velocityY: 0 });
+  expect(back.velocityY).toBeGreaterThan(0);
 });
