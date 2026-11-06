@@ -267,12 +267,21 @@ function GamePad() {
   );
 }
 
-// Each new level arrives with a strike on the new coin. Keyed by level, so the
-// animation plays once per level; level 1 (a fresh game) has none.
+// Each new level arrives with a lightning strike on the new coin, and so does
+// going back to level 1 after a crash or flying away. The flash hides the sky
+// and rain changing underneath. Keyed by strike, so each one plays once.
 function Lightning() {
-  const { level, coinX, coinY } = useContext(StateContext);
-  if (level === 1) return null;
-  return <Strike key={level} level={level} coinX={coinX} coinY={coinY} />;
+  const { crashedAt, level, coinX, coinY } = useContext(StateContext);
+  const [previous, setPrevious] = useState({ crashedAt, level });
+  const [strikes, setStrikes] = useState(0);
+  if (previous.crashedAt !== crashedAt || previous.level !== level) {
+    setPrevious({ crashedAt, level });
+    if (level > previous.level || isReset(previous, { crashedAt, level })) {
+      setStrikes(strikes + 1);
+    }
+  }
+  if (strikes === 0) return null;
+  return <Strike key={strikes} level={level} coinX={coinX} coinY={coinY} />;
 }
 
 function Strike({
@@ -304,19 +313,6 @@ function Strike({
       />
     </>
   );
-}
-
-// Going back to level 1, after a crash or flying away, flashes too, so the sky
-// and rain jump back to their first look under cover of the flash.
-function ResetFlash() {
-  const { crashedAt, level } = useContext(StateContext);
-  const [previous, setPrevious] = useState({ crashedAt, level });
-  const [resets, setResets] = useState(0);
-  if (previous.crashedAt !== crashedAt || previous.level !== level) {
-    setPrevious({ crashedAt, level });
-    if (isReset(previous, { crashedAt, level })) setResets(resets + 1);
-  }
-  return resets > 0 ? <div key={resets} className="flash" /> : null;
 }
 
 // preview builds (VITE_PREVIEW=1) get a button to skip to the next level
@@ -358,7 +354,6 @@ const Scene = memo(function () {
         <Crash />
         <Rain front={true} />
         <Lightning />
-        <ResetFlash />
       </Sky>
       <Debug />
       <GamePad />
