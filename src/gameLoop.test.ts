@@ -2,6 +2,8 @@ import { expect, test } from "vitest";
 import {
   COIN_HEIGHT,
   COIN_WIDTH,
+  CRASH_DURATION,
+  DECK_LIFT,
   SCENE_HEIGHT,
   SCENE_WIDTH,
   VEHICLE_HEIGHT,
@@ -41,6 +43,29 @@ test("engine unpauses, and thrust beats gravity", () => {
 
 test("wind pushes the vehicle sideways", () => {
   expect(tick(flying).velocityX).toBeGreaterThan(0);
+});
+
+test("wind keeps rising past level 20, and stays stable at level 10000", () => {
+  const landed = {
+    ...flying,
+    positionX: 60,
+    positionY: 0,
+    coinVisible: false,
+    level: 25,
+  };
+  expect(tick(landed).windVelocityX).toBeCloseTo(
+    landed.windVelocityX + WIND_VELOCITY_X_INCREMENTAL
+  );
+
+  const windVelocityX =
+    initialGameState.windVelocityX + 9999 * WIND_VELOCITY_X_INCREMENTAL;
+  let state: GameState = { ...flying, windVelocityX, coinVisible: false };
+  for (let i = 0; i < 60; i++) {
+    state = tick({ ...state, positionY: 20, velocityY: 0 });
+    expect(state.velocityX).toBeLessThanOrEqual(windVelocityX);
+    expect(state.positionX).toBeGreaterThanOrEqual(0);
+    expect(state.positionX).toBeLessThan(SCENE_WIDTH);
+  }
 });
 
 test("touching the coin scores and hides it", () => {
@@ -96,6 +121,7 @@ test("stopping on the platform after a coin spawns a new one and adds wind", () 
   expect(next.windVelocityX).toBeCloseTo(
     flying.windVelocityX + WIND_VELOCITY_X_INCREMENTAL
   );
+  expect(next.level).toBe(flying.level + 1);
 });
 
 test("coins spawn fully on screen and clear of a parked copter", () => {
@@ -103,7 +129,7 @@ test("coins spawn fully on screen and clear of a parked copter", () => {
   for (let i = 0; i < 200; i++) {
     state = tick({ ...state, positionX: 60, positionY: 0, coinVisible: false });
     expect(state.coinVisible).toBe(true);
-    expect(state.coinY + COIN_HEIGHT).toBeLessThanOrEqual(SCENE_HEIGHT);
+    expect(state.coinY + DECK_LIFT + COIN_HEIGHT).toBeLessThanOrEqual(SCENE_HEIGHT);
     expect(state.coinX + COIN_WIDTH).toBeLessThanOrEqual(SCENE_WIDTH);
     expect(state.coinY).toBeGreaterThanOrEqual(VEHICLE_HEIGHT);
   }
@@ -135,17 +161,49 @@ test("landing softly on the platform is safe", () => {
   expect(next.velocityY).toBe(0);
 });
 
-test("landing too hard crashes and records the score", () => {
-  const next = tick({
+test("landing too hard crashes, plays the animation, then resets", () => {
+  const crashed = tick({
     ...flying,
     positionX: 60,
     positionY: -0.1,
     velocityY: -1,
     score: 300,
     bestScore: 200,
+    engine: true,
   });
+  expect(crashed.crashedAt).toBe(crashed.timestamp);
+  expect(crashed.crashX).toBe(60);
+  expect(crashed.engine).toBe(false);
+  expect(crashed.lastScore).toBe(300);
+  expect(crashed.bestScore).toBe(300);
+
+  // input and physics wait for the animation
+  expect(gameReducer(crashed, startEngine)).toBe(crashed);
+  const playing = tick(crashed, CRASH_DURATION - 1);
+  expect(playing.positionY).toBe(crashed.positionY);
+  expect(playing.crashedAt).toBe(crashed.crashedAt);
+
+  const reset = tick(playing, 1);
+  expect(reset.crashedAt).toBeNull();
+  expect(reset.level).toBe(1);
+  expect(reset.paused).toBe(true);
+  expect(reset.score).toBe(0);
+  expect(reset.lastScore).toBe(300);
+  expect(reset.bestScore).toBe(300);
+});
+
+test("level only changes after landing with the coin", () => {
+  const start = { ...flying, level: 7 };
+  expect(tick(start).level).toBe(7); // flying
+  expect(tick({ ...start, coinVisible: false }).level).toBe(7); // got coin, still airborne
+  const onPad = { ...start, positionX: 60, positionY: 0 };
+  expect(tick(onPad).level).toBe(7); // landed, but no coin yet
+  expect(tick({ ...onPad, coinVisible: false }).level).toBe(8);
+});
+
+test("flying away resets without a crash animation", () => {
+  const next = tick({ ...flying, positionY: 1001, score: 100 });
+  expect(next.crashedAt).toBeNull();
   expect(next.paused).toBe(true);
-  expect(next.score).toBe(0);
-  expect(next.lastScore).toBe(300);
-  expect(next.bestScore).toBe(300);
+  expect(next.lastScore).toBe(100);
 });

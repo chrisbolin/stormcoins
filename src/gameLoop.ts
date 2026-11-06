@@ -14,6 +14,8 @@ import {
   COIN_WIDTH,
   COIN_HEIGHT,
   VEHICLE_ZERO_VELOCITY,
+  CRASH_DURATION,
+  DECK_LIFT,
   SCENE_WIDTH,
   SCENE_HEIGHT,
   WIND_VELOCITY_X_INITIAL,
@@ -36,6 +38,9 @@ export interface GameState {
   coinX: number;
   coinY: number;
   windVelocityX: number;
+  level: number;
+  crashedAt: number | null; // timestamp, while the crash animation plays
+  crashX: number;
 }
 
 export interface PersistedGameState {
@@ -58,7 +63,17 @@ export const initialGameState: GameState = {
   coinX: 30,
   coinY: 35,
   windVelocityX: WIND_VELOCITY_X_INITIAL,
+  level: 1,
+  crashedAt: null,
+  crashX: 0,
 };
+
+export function isOverPlatform(positionX: number): boolean {
+  return (
+    positionX > PLATFORM_LEFT - VEHICLE_WIDTH / 2 &&
+    positionX < PLATFORM_LEFT + PLATFORM_WIDTH - VEHICLE_WIDTH / 2
+  );
+}
 
 // ACTIONS
 const TICK = "tick";
@@ -95,8 +110,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         coinX,
         coinY,
         windVelocityX,
+        level,
       } = state;
       const dt = timestamp - state.timestamp;
+
+      // crash animation is playing; the scores were recorded when it started
+      if (state.crashedAt !== null) {
+        return timestamp - state.crashedAt < CRASH_DURATION
+          ? { ...state, timestamp }
+          : {
+              ...initialGameState,
+              lastScore: state.lastScore,
+              bestScore: state.bestScore,
+              timestamp,
+            };
+      }
 
       positionX = (positionX + dt * velocityX + SCENE_WIDTH) % SCENE_WIDTH; // wrap x around with (x + width) % width;
 
@@ -119,24 +147,32 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         coinY =
           VEHICLE_HEIGHT +
           (coinY - VEHICLE_HEIGHT + SCENE_HEIGHT * 0.25) %
-            (SCENE_HEIGHT - COIN_HEIGHT - VEHICLE_HEIGHT);
+            (SCENE_HEIGHT - DECK_LIFT - COIN_HEIGHT - VEHICLE_HEIGHT);
         windVelocityX = windVelocityX + WIND_VELOCITY_X_INCREMENTAL;
+        level = level + 1;
       } else if (
         // landing
         !state.engine &&
         state.positionY <= 0 && // allow for 0, as landing sets to 0
-        state.positionX > PLATFORM_LEFT - VEHICLE_WIDTH / 2 &&
-        state.positionX < PLATFORM_LEFT + PLATFORM_WIDTH - VEHICLE_WIDTH / 2 &&
+        isOverPlatform(state.positionX) &&
         -state.velocityY < VEHICLE_CRASH_VELOCITY
       ) {
         positionY = 0;
         velocityY = 0;
         velocityX = state.velocityX * (1 - COEFFICIENT_FRICTION);
-      } else if (
-        state.positionY < 0 ||
-        state.positionY > VEHICLE_MAX_ALTITUDE
-      ) {
-        // crashed
+      } else if (state.positionY < 0) {
+        // crashed; play the animation before resetting
+        return {
+          ...state,
+          lastScore: score,
+          bestScore: score > state.bestScore ? score : state.bestScore,
+          engine: false,
+          timestamp,
+          crashedAt: timestamp,
+          crashX: state.positionX,
+        };
+      } else if (state.positionY > VEHICLE_MAX_ALTITUDE) {
+        // flew away; nothing on screen to animate
         return {
           ...initialGameState,
           lastScore: score,
@@ -149,12 +185,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         velocityY =
           state.velocityY +
           (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
+        const drag =
+          Math.pow(relativeWindVelocityX, 2) *
+          Math.sign(relativeWindVelocityX) *
+          COEFFICIENT_DRAG *
+          dt;
+        // strong wind can't push the vehicle past wind speed in one tick. Without
+        // this, velocity oscillates and overflows at very high levels
         velocityX =
           state.velocityX +
-          Math.pow(relativeWindVelocityX, 2) *
-            Math.sign(relativeWindVelocityX) *
-            COEFFICIENT_DRAG *
-            dt;
+          (Math.abs(drag) < Math.abs(relativeWindVelocityX)
+            ? drag
+            : relativeWindVelocityX);
         positionY = state.positionY + dt * state.velocityY;
       }
 
@@ -182,9 +224,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         score,
         coinVisible,
         windVelocityX,
+        level,
       };
     }
     case START_ENGINE:
+      if (state.crashedAt !== null) return state;
       return { ...state, paused: false, engine: true };
     case STOP_ENGINE:
       return { ...state, engine: false };

@@ -1,8 +1,16 @@
-import { createContext, memo, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  memo,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import type { Dispatch } from "react";
 import "./App.css";
 import {
   initialGameState,
+  isOverPlatform,
   useGameLoop,
   startEngine,
   stopEngine,
@@ -11,13 +19,27 @@ import type { GameAction } from "./gameLoop";
 import { useTextLayout } from "./textLayout";
 import type { TextLayout } from "./textLayout";
 import {
+  ART_PIXEL,
+  CRASH_SPRITE_HEIGHT,
+  CRASH_SPRITE_WIDTH,
+  DECK_LIFT,
   PLATFORM_LEFT,
+  PLATFORM_SPRITE_HEIGHT,
+  PLATFORM_SPRITE_WIDTH,
   PLATFORM_WIDTH,
+  SCENE_WIDTH,
   VEHICLE_WIDTH,
   VEHICLE_HEIGHT,
   COIN_HEIGHT,
   COIN_WIDTH,
 } from "./constants";
+import {
+  RAIN_CANVAS_HEIGHT,
+  RAIN_CANVAS_WIDTH,
+  RAIN_FRAME_DURATION,
+  drawRain,
+  rainForLevel,
+} from "./rain";
 
 // game units to CSS: the square screen is 100 units on each side
 const units = (n: number) => `calc(var(--unit) * ${n})`;
@@ -41,22 +63,84 @@ function addGlobalListeners(dispatch: Dispatch<GameAction>) {
   };
 }
 
-function Platform() {
+// redraws only on a new animation frame, and picks up a new level's rain only
+// when the level changes
+function Rain({ front }: { front: boolean }) {
+  const { level } = useContext(StateContext);
+  const canvas = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const context = canvas.current?.getContext("2d");
+    if (!context) return;
+    const rain = rainForLevel(level);
+    let shownFrame = -1;
+    let request = window.requestAnimationFrame(function draw(timestamp) {
+      const frame = Math.floor(timestamp / RAIN_FRAME_DURATION);
+      if (frame !== shownFrame) {
+        shownFrame = frame;
+        drawRain(context, rain, frame, front);
+      }
+      request = window.requestAnimationFrame(draw);
+    });
+    return () => window.cancelAnimationFrame(request);
+  }, [level, front]);
+
   return (
-    <div
-      className="platform"
+    <canvas
+      ref={canvas}
+      className="rain"
+      width={RAIN_CANVAS_WIDTH}
+      height={RAIN_CANVAS_HEIGHT}
       style={{
-        left: units(PLATFORM_LEFT),
-        width: units(PLATFORM_WIDTH),
+        width: units(RAIN_CANVAS_WIDTH * ART_PIXEL),
+        height: units(RAIN_CANVAS_HEIGHT * ART_PIXEL),
       }}
     />
   );
 }
 
+function Platform() {
+  return (
+    <div
+      className="platform"
+      style={{
+        // the sprite is a hair wider than the landing zone; keep it centered
+        left: units(PLATFORM_LEFT - (PLATFORM_SPRITE_WIDTH - PLATFORM_WIDTH) / 2),
+        width: units(PLATFORM_SPRITE_WIDTH),
+        height: units(PLATFORM_SPRITE_HEIGHT),
+      }}
+    />
+  );
+}
+
+function Crash() {
+  const { crashedAt, crashX } = useContext(StateContext);
+  if (crashedAt === null) return null;
+  const left = crashX + VEHICLE_WIDTH / 2 - CRASH_SPRITE_WIDTH / 2;
+  // the blast is wide, so wrap it around the screen like the copter
+  return (
+    <>
+      {[left - SCENE_WIDTH, left, left + SCENE_WIDTH].map((x) => (
+        <div
+          key={x}
+          className="crash"
+          style={{
+            left: units(x),
+            bottom: units(isOverPlatform(crashX) ? DECK_LIFT : 0),
+            width: units(CRASH_SPRITE_WIDTH),
+            height: units(CRASH_SPRITE_HEIGHT),
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
 function Vehicle() {
-  const { positionX, positionY } = useContext(StateContext);
+  const { positionX, positionY, crashedAt } = useContext(StateContext);
+  if (crashedAt !== null) return null;
   // render two copters, so that when the player "wraps around" the screen it's fluid
-  const bottom = units(positionY);
+  const bottom = units(positionY + DECK_LIFT);
   const width = units(VEHICLE_WIDTH);
   const height = units(VEHICLE_HEIGHT);
   return (
@@ -81,7 +165,7 @@ function Coin() {
       className="coin"
       style={{
         left: units(coinX),
-        bottom: units(coinY),
+        bottom: units(coinY + DECK_LIFT),
         width: units(COIN_WIDTH),
         height: units(COIN_HEIGHT),
       }}
@@ -184,9 +268,12 @@ const Scene = memo(function () {
   return (
     <div className="scene">
       <div className="sky">
+        <Rain front={false} />
         <Platform />
         <Coin />
         <Vehicle />
+        <Crash />
+        <Rain front={true} />
       </div>
       <Debug />
       <GamePad />

@@ -131,11 +131,53 @@ pre {
   font-size: clamp(9px, calc(var(--unit) * 1.5), 16px);
 }
 
+.rain {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* helipad-sprite.png is 4 frames of 352x56 (lamps blinking) */
+@keyframes animate-platform {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    /* 4 frames: 400% sheet, so -4 frame widths = 133.33% */
+    background-position: 133.333% 0;
+  }
+}
+
 .platform {
   position: absolute;
-  height: calc(var(--unit) * 2);
-  bottom: calc(var(--unit) * -1);
-  background-color: grey;
+  bottom: 0;
+  background-image: url("helipad-sprite.png");
+  background-size: 400% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: animate-platform 0.8s steps(4) infinite;
+}
+
+/* crash-sprite.png is 18 frames of 384x224, played once (CRASH_DURATION) */
+@keyframes animate-crash {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    /* 18 frames: 1800% sheet, so -18 frame widths = 18/17 */
+    background-position: 105.882% 0;
+  }
+}
+
+.crash {
+  position: absolute;
+  background-image: url("crash-sprite.png");
+  background-size: 1800% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: animate-crash 1.26s steps(18) forwards;
 }
 
 /* copter-sprite.png is 4 frames of 140x64 (rotor spinning) */

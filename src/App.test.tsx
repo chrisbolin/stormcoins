@@ -1,8 +1,13 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeAll, expect, test, vi } from "vitest";
 import App from "./App";
 
 afterEach(cleanup);
+
+// jsdom has no canvas, and logs an error when asked for one
+beforeAll(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+});
 
 test("shows instructions until the spacebar starts the game", () => {
   const { container } = render(<App />);
