@@ -216,3 +216,63 @@ pre {
   image-rendering: pixelated;
   animation: animate-coin 1s steps(6) infinite;
 }
+
+/* A new level: a bolt strikes the new coin, and a double flash hides the sky
+   and rain changing underneath. Both play once, keyed by level. */
+.flash {
+  position: absolute;
+  inset: 0;
+  background-color: white;
+  pointer-events: none;
+  opacity: 0;
+  animation: flash 0.7s linear forwards;
+}
+
+@keyframes flash {
+  0%, 6% { opacity: 0.85; }
+  6.01%, 14% { opacity: 0.1; }
+  14.01% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+.bolt {
+  opacity: 0;
+  animation: bolt 0.7s linear forwards;
+}
+
+@keyframes bolt {
+  0%, 10% { opacity: 1; }
+  10.01%, 16% { opacity: 0; }
+  16.01%, 36% { opacity: 1; }
+  36.01%, 100% { opacity: 0; }
+}
+
+/* one soft flash, no flicker */
+@media (prefers-reduced-motion: reduce) {
+  .flash { animation-name: flash-soft; }
+  .bolt { animation-name: bolt-soft; }
+}
+
+@keyframes flash-soft {
+  0% { opacity: 0.35; }
+  100% { opacity: 0; }
+}
+
+@keyframes bolt-soft {
+  0%, 40% { opacity: 1; }
+  40.01%, 100% { opacity: 0; }
+}
+
+/* preview builds only */
+.preview-next {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  font: 16px "Silkscreen", monospace;
+  color: black;
+  background-color: #f4c430;
+  border: 0;
+  padding: 10px 14px;
+  cursor: pointer;
+}
