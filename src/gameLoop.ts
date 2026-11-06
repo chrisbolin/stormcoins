@@ -11,6 +11,7 @@ import {
   VEHICLE_HEIGHT,
   VEHICLE_CRASH_VELOCITY,
   VEHICLE_MAX_ALTITUDE,
+  VEHICLE_CEILING,
   COIN_WIDTH,
   COIN_HEIGHT,
   VEHICLE_ZERO_VELOCITY,
@@ -112,6 +113,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         windVelocityX,
         level,
       } = state;
+      let { engine } = state;
       const dt = timestamp - state.timestamp;
 
       // crash animation is playing; the scores were recorded when it started
@@ -180,11 +182,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           timestamp,
         };
       } else {
-        // flying
+        // flying. Past the top of the screen the engine cuts out, and stays off
+        // until the player presses again
+        if (state.positionY > VEHICLE_CEILING) engine = false;
         const relativeWindVelocityX = windVelocityX - velocityX;
         velocityY =
           state.velocityY +
-          (FORCE_ENGINE * Number(state.engine) - FORCE_GRAVITY) * dt;
+          (FORCE_ENGINE * Number(engine) - FORCE_GRAVITY) * dt;
         const drag =
           Math.pow(relativeWindVelocityX, 2) *
           Math.sign(relativeWindVelocityX) *
@@ -214,6 +218,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       return {
         ...state,
+        engine,
         timestamp,
         positionX,
         positionY,

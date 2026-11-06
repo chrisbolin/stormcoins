@@ -50,7 +50,8 @@ const StateContext = createContext(initialGameState);
 
 function addGlobalListeners(dispatch: Dispatch<GameAction>) {
   const onKeyDown = (event: KeyboardEvent) => {
-    if (event.code === "Space") dispatch(startEngine);
+    // ignore key repeat, so holding the key doesn't restart an engine that cut out
+    if (event.code === "Space" && !event.repeat) dispatch(startEngine);
   };
   const onKeyUp = (event: KeyboardEvent) => {
     if (event.code === "Space") dispatch(stopEngine);

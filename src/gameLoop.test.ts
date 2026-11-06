@@ -6,6 +6,7 @@ import {
   DECK_LIFT,
   SCENE_HEIGHT,
   SCENE_WIDTH,
+  VEHICLE_CEILING,
   VEHICLE_HEIGHT,
   VEHICLE_WIDTH,
   WIND_VELOCITY_X_INCREMENTAL,
@@ -206,4 +207,16 @@ test("flying away resets without a crash animation", () => {
   expect(next.crashedAt).toBeNull();
   expect(next.paused).toBe(true);
   expect(next.lastScore).toBe(100);
+});
+
+test("the engine cuts out above the top of the screen and stays off", () => {
+  const high = tick({ ...flying, engine: true, positionY: VEHICLE_CEILING + 1 });
+  expect(high.engine).toBe(false);
+  expect(high.velocityY).toBeLessThan(0);
+  // still off after falling back below the top, until pressed again
+  const below = tick({ ...high, positionY: VEHICLE_CEILING - 1 });
+  expect(below.engine).toBe(false);
+  expect(gameReducer(below, startEngine).engine).toBe(true);
+  // below the top, the engine keeps running
+  expect(tick({ ...flying, engine: true, positionY: VEHICLE_CEILING - 1 }).engine).toBe(true);
 });

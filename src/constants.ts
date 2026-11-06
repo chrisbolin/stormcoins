@@ -34,6 +34,8 @@ export const PLATFORM_SPRITE_WIDTH = 73 * ART_PIXEL;
 export const PLATFORM_SPRITE_HEIGHT = 14 * ART_PIXEL;
 // positionY 0 is drawn this far above the ground, so skids rest on the deck
 export const DECK_LIFT = 4 * ART_PIXEL;
+// above this, the top of the copter is past the top of the screen and the engine cuts out
+export const VEHICLE_CEILING = SCENE_HEIGHT - DECK_LIFT - VEHICLE_HEIGHT;
 
 // CRASH
 // crash-sprite.png is 18 frames of 96 x 56 art pixels
